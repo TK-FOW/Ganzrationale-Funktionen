@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trainingscamp Ganzrationale Funktionen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: schmale Lesespalte, Cards auf hellem Violettgrund, je Station eine Ansicht */
+  --ink:#1f1d3a; --muted:#5c5978; --bg:#f4f2ff; --card:#ffffff; --line:#e3dff6;
+  --brand:#6d3bf5; --brand-soft:#efe9ff; --teal:#0aa6a0; --teal-soft:#e2f7f5;
+  --coral:#f0456a; --coral-soft:#ffe9ee; --sun:#b97400; --sun-soft:#fff3d6;
+  --good:#0b8a5f; --good-soft:#e1f6ee; --bad:#c2255c; --bad-soft:#ffe8f0;
+  --display:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --r:18px; --shadow:0 6px 24px rgba(60,40,140,.08);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+p{margin:.5em 0}
+sup,sub{line-height:0;font-size:.72em}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+
+header.top{background:linear-gradient(120deg,#6d3bf5 0%,#8b5cf6 45%,#0fb5ae 100%);color:#fff;padding:22px 0 18px}
+.top .wrap{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between}
+.top .eyebrow{font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.top h1{font-size:clamp(1.5rem,4vw,2.1rem);font-weight:700}
+.top p{margin:.25em 0 0;opacity:.95;max-width:46ch}
+.prog{min-width:220px;flex:1;max-width:320px}
+.prog small{display:flex;justify-content:space-between;font-size:.85rem}
+.bar{height:10px;border-radius:99px;background:rgba(255,255,255,.3);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:width .4s}
+
+nav.stations{position:sticky;top:0;z-index:5;background:rgba(244,242,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:8px;overflow-x:auto;padding-top:10px;padding-bottom:10px}
+nav button{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.92rem;white-space:nowrap}
+nav button[aria-current="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+nav button.done::after{content:" ✓";color:var(--good)}
+nav button[aria-current="true"].done::after{color:#fff}
+
+main{padding:26px 0 70px}
+.view{display:none}
+.view.on{display:flex;flex-direction:column;gap:20px}
+.vhead .eyebrow{color:var(--brand);font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase}
+.vhead h2{font-size:clamp(1.5rem,4vw,2rem);margin-top:2px}
+.vhead .can{margin-top:8px;background:var(--brand-soft);border-radius:12px;padding:10px 14px;display:inline-block}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
+.card>h3{font-size:1.15rem;margin-bottom:10px}
+.card h4{font-size:1rem;margin:14px 0 6px}
+.tag{display:inline-block;font-family:var(--display);font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;border-radius:99px;padding:3px 10px;margin-bottom:8px}
+.info .tag{background:var(--brand-soft);color:var(--brand)}
+.lab{border:2px solid var(--teal-soft)} .lab .tag{background:var(--teal-soft);color:#06716d}
+.ex .tag{background:var(--sun-soft);color:#7a4d00}
+.prac .tag{background:var(--coral-soft);color:#a61e41}
+.quiz .tag{background:var(--brand);color:#fff}
+.tr{background:#1f1d3a;color:#f3f1ff} .tr .tag{background:#3a3666;color:#fff}
+.tr kbd{background:#fff;color:#1f1d3a;border-radius:6px;padding:1px 7px;font-family:var(--body);font-size:.88em;font-weight:700;white-space:nowrap}
+.tr ol{margin:.4em 0;padding-left:1.3em} .tr li{margin:.25em 0}
+.gg{background:var(--teal-soft)} .gg .tag{background:#fff;color:#06716d}
+.gg code,.card code{background:rgba(0,0,0,.06);border-radius:6px;padding:1px 6px;font-size:.92em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.f{font-family:var(--display);font-weight:600;background:var(--brand-soft);border-radius:10px;padding:8px 12px;display:inline-block;margin:4px 0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--brand-soft);font-family:var(--display);font-weight:600;font-size:.92rem}
+td.num,th.num{text-align:right}
+
+.labgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+canvas{width:100%;height:330px;display:block;border-radius:12px;border:1px solid var(--line);background:#fbfaff}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.88rem;margin-top:8px;color:var(--muted)}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid;vertical-align:middle;margin-right:5px}
+.ctrl{display:flex;flex-direction:column;gap:10px}
+.ctrl label{font-weight:600;font-size:.95rem;display:flex;justify-content:space-between;gap:8px}
+.ctrl output{color:var(--brand);font-variant-numeric:tabular-nums}
+.ctrl input[type=range]{width:100%;accent-color:var(--brand);margin:0}
+.ctrl .chk{justify-content:flex-start;font-weight:500}
+.out{background:var(--teal-soft);border-radius:12px;padding:12px 14px;font-size:.96rem}
+.out b{font-family:var(--display)}
+.btn{border:0;border-radius:12px;background:var(--brand);color:#fff;font-weight:600;padding:9px 16px;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}
+.btn.small{padding:6px 12px;font-size:.9rem}
+.btn:hover{filter:brightness(1.08)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+.step{border-left:4px solid var(--sun-soft);padding:6px 0 6px 14px;margin:8px 0}
+.step b.n{font-family:var(--display);color:#7a4d00}
+.step[hidden]{display:none}
+.task{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:12px}
+.task .tn{font-family:var(--display);font-weight:600;color:var(--coral);font-size:.9rem}
+.task input[type=text]{border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;width:100%;max-width:260px;background:#fff}
+.task select{border:1.5px solid var(--line);border-radius:10px;padding:7px 8px;background:#fff}
+.fields{display:flex;flex-wrap:wrap;gap:10px 16px;margin:8px 0}
+.fields label{display:flex;flex-direction:column;font-size:.88rem;font-weight:600;gap:3px}
+.fields input[type=text]{width:110px}
+.fields .okf{border-color:var(--good)!important;background:var(--good-soft)!important}
+.fields .nof{border-color:var(--bad)!important;background:var(--bad-soft)!important}
+.fb{margin-top:8px;font-weight:600;min-height:1.2em}
+.fb.ok{color:var(--good)} .fb.no{color:var(--bad)}
+details{margin-top:8px}
+summary{cursor:pointer;color:var(--brand);font-weight:600}
+details .sol{background:var(--brand-soft);border-radius:12px;padding:10px 14px;margin-top:8px}
+.opts{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.opt{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 14px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--brand)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.qq{border-top:1px solid var(--line);padding:14px 0}
+.qq:first-of-type{border-top:0}
+.qq .why{margin-top:8px;background:var(--brand-soft);border-radius:12px;padding:9px 14px}
+.score{font-family:var(--display);font-size:1.1rem;background:var(--good-soft);border-radius:14px;padding:14px 16px;margin-top:10px}
+.self{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.self button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 14px;font-weight:700;cursor:pointer}
+.self button[aria-pressed=true]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+pre.div{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.95rem;background:#1f1d3a;color:#f3f1ff;border-radius:12px;padding:14px;overflow-x:auto;line-height:1.5;margin:10px 0}
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.map button{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.map button:hover{border-color:var(--brand)}
+.map .no{font-family:var(--display);font-weight:700;color:var(--brand)}
+.map .st{font-size:.85rem;color:var(--muted)}
+.map .st.ok{color:var(--good);font-weight:600}
+textarea.bk{width:100%;min-height:92px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;background:#fff;margin:8px 0;resize:vertical;word-break:break-all}
+.mail{border-left:5px solid var(--brand);background:var(--brand-soft);border-radius:0 14px 14px 0;padding:12px 16px}
+.warn{background:var(--sun-soft);border-radius:12px;padding:10px 14px}
+ul.tight{margin:.3em 0;padding-left:1.2em} ul.tight li{margin:.2em 0}
+@media (max-width:760px){.labgrid,.two{grid-template-columns:1fr} canvas{height:280px} .card{padding:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{nav.stations,.foot{display:none}.view{display:flex!important;flex-direction:column;gap:14px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div>
+    <div class="eyebrow">Global-Bike GmbH · FOS Wirtschaft · Klasse 12 · Mathematik</div>
+    <h1>Trainingscamp Ganzrationale Funktionen</h1>
+    <p>Üben, ausprobieren und für die Klausur fit werden.</p>
+  </div>
+  <div class="prog" aria-live="polite"><small><span>Ihr Fortschritt</span><span id="progTxt">0 von 8 Quiz geschafft</span></small><div class="bar"><i id="progBar"></i></div></div>
+</div></header>
+<nav class="stations" aria-label="Stationen"><div class="wrap" id="nav"></div></nav>
+
+<main class="wrap" id="app">
+
+<!-- ================= START ================= -->
+<section class="view" id="v-start">
+  <div class="card">
+    <h3>Ihr Auftrag im Trainingscamp</h3>
+    <div class="mail">
+      <p><b>Von:</b> Sandra Lorenz (Leitung Controlling)<br><b>An:</b> Trainee-Team Controlling<br><b>Betreff:</b> Trainingscamp vor der Klausur</p>
+      <p>Liebes Trainee-Team,<br>am CargoNord haben Sie gezeigt, wie man eine Gewinnfunktion untersucht. Damit die Verfahren sicher sitzen, trainieren Sie jetzt an zwei weiteren Produkten: dem E-Trekkingrad <b>TourNord</b> und dem E-Scooter <b>ScootNord</b>. Die Aufgaben hier sind neu. Die Rechenwege sind dieselben wie in Ihren Bausteinen.</p>
+      <p>Viel Erfolg!<br>Sandra Lorenz</p>
+    </div>
+  </div>
+  <div class="two">
+    <div class="card info">
+      <span class="tag">Datenblatt</span>
+      <h3>E-Trekkingrad TourNord</h3>
+      <div class="tbl"><table>
+        <tr><th>Größe</th><th>Funktion / Wert</th></tr>
+        <tr><td>Mengeneinheit</td><td>1 ME = 100 Räder</td></tr>
+        <tr><td>Geldeinheit</td><td>1 GE = 10.000 €</td></tr>
+        <tr><td>Kapazitätsgrenze</td><td>11 ME pro Jahr</td></tr>
+        <tr><td>Preis-Absatz-Funktion</td><td>p(x) = 60 − 2x</td></tr>
+        <tr><td>Kostenfunktion</td><td>K(x) = x^3 − 12x^2 + 63x + 54</td></tr>
+        <tr><td>Gewinnfunktion</td><td>G(x) = −x^3 + 10x^2 − 3x − 54</td></tr>
+      </table></div>
+    </div>
+    <div class="card">
+      <h3>So arbeiten Sie hier</h3>
+      <ul class="tight">
+        <li><b>Kurz erklärt:</b> das Wichtigste aus der Infobox Ihres Bausteins.</li>
+        <li><b>Labor:</b> Regler bewegen und sofort sehen, was sich am Graphen ändert.</li>
+        <li><b>Beispiel:</b> Schritt für Schritt aufdecken. Rechnen Sie auf Papier mit.</li>
+        <li><b>Üben:</b> Ergebnis eintippen und prüfen lassen. Der Lösungsweg lässt sich aufklappen.</li>
+        <li><b>Taschenrechner:</b> Tastenfolgen für den Casio fx-991DE X.</li>
+        <li><b>Quiz:</b> fünf Fragen mit sofortiger Rückmeldung.</li>
+      </ul>
+      <p class="warn"><b>Für die Klausur:</b> Erlaubt ist nur der Taschenrechner. GeoGebra dient zu Hause zur Kontrolle. Der Rechenweg muss immer vollständig auf dem Papier stehen.</p>
+      <p style="color:var(--muted);font-size:.9rem">Dezimalzahlen geben Sie mit Komma ein, mehrere Nullstellen trennen Sie mit Semikolon, zum Beispiel <code>−2; 0; 3,5</code>. Quiz-Ergebnisse, Selbsteinschätzung und Ihre Eingaben in den Aufgaben werden in diesem Browser gespeichert. Für ein anderes Gerät nutzen Sie den Sicherungscode unten auf dieser Seite.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Lernlandkarte</h3>
+    <div class="map" id="map"></div>
+  </div>
+  <div class="card">
+    <h3>Fortschritt sichern und auf ein anderes Gerät mitnehmen</h3>
+    <p>Ihr Stand liegt nur in diesem Browser auf diesem Gerät. Mit einem Sicherungscode nehmen Sie ihn mit, zum Beispiel vom Schul-Tablet aufs Handy. Schicken Sie sich den Code selbst per Mail oder Messenger oder speichern Sie ihn in einer Notiz.</p>
+    <div class="two">
+      <div>
+        <h4>1. Hier sichern</h4>
+        <button class="btn small" id="bkMake" type="button">Sicherungscode erzeugen</button>
+        <textarea class="bk" id="bkOut" readonly aria-label="Ihr Sicherungscode" placeholder="Hier erscheint Ihr Code."></textarea>
+        <div class="row"><button class="btn ghost small" id="bkCopy" type="button">Code kopieren</button><span id="bkMsg" aria-live="polite" style="font-weight:600"></span></div>
+      </div>
+      <div>
+        <h4>2. Auf dem anderen Gerät einlesen</h4>
+        <label for="bkIn">Code hier einfügen. Der Stand auf diesem Gerät wird dabei ersetzt.</label>
+        <textarea class="bk" id="bkIn" autocomplete="off" spellcheck="false" placeholder="GB1-…"></textarea>
+        <div class="row"><button class="btn small" id="bkLoad" type="button">Code einlesen</button><span id="bkMsg2" aria-live="polite" style="font-weight:600"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= B1 ================= -->
+<section class="view" id="v-b1">
+  <div class="card info">
+    <span class="tag">Kurz erklärt</span>
+    <h3>Der Leitterm entscheidet</h3>
+    <p>Für sehr große positive oder negative x bestimmt allein der <b>Leitterm a<sub>n</sub>x^n</b> das Verhalten der Funktionswerte. Zwei Fragen genügen: Ist der Grad n gerade oder ungerade? Ist der Leitkoeffizient a_n positiv oder negativ?</p>
+    <div class="tbl"><table>
+      <tr><th></th><th>a_n &gt; 0</th><th>a_n &lt; 0</th></tr>
+      <tr><th>n gerade</th><td>von links oben nach rechts oben<br>x → −∞: f(x) → +∞ · x → +∞: f(x) → +∞</td><td>von links unten nach rechts unten<br>x → −∞: f(x) → −∞ · x → +∞: f(x) → −∞</td></tr>
+      <tr><th>n ungerade</th><td>von links unten nach rechts oben<br>x → −∞: f(x) → −∞ · x → +∞: f(x) → +∞</td><td>von links oben nach rechts unten<br>x → −∞: f(x) → +∞ · x → +∞: f(x) → −∞</td></tr>
+    </table></div>
+    <ul class="tight">
+      <li><b>Absolutes Glied a_0:</b> Schnittpunkt mit der y-Achse (0 | a_0). Bei einer Kostenfunktion sind das die Fixkosten.</li>
+      <li><b>Unsortierte Terme:</b> Der Leitterm ist der Summand mit dem höchsten Exponenten, egal wo er steht.</li>
+      <li><b>Produkte:</b> Für den Leitterm nur die höchsten x-Potenzen jeder Klammer und den Vorfaktor multiplizieren.</li>
+    </ul>
+  </div>
+
+  <div class="card lab">
+    <span class="tag">Labor</span>
+    <h3>Grad und Leitkoeffizient steuern den Verlauf</h3>
+    <div class="labgrid">
+      <div><canvas id="c1" role="img" aria-label="Graph der eingestellten Funktion und ihres Leitterms"></canvas>
+        <div class="legend"><span><i style="border-color:#6d3bf5"></i>f(x)</span><span><i style="border-color:#f0456a;border-top-style:dashed"></i>nur der Leitterm</span></div></div>
+      <div class="ctrl">
+        <label for="l1n">Grad n <output id="l1nO"></output></label><input type="range" id="l1n" min="1" max="6" step="1" value="3">
+        <label for="l1a">Leitkoeffizient a_n <output id="l1aO"></output></label><input type="range" id="l1a" min="-2" max="2" step="0.25" value="-1">
+        <label for="l1z">Ausschnitt der x-Achse <output id="l1zO"></output></label><input type="range" id="l1z" min="0" max="6" step="1" value="1">
+        <label class="chk" for="l1e"><input type="checkbox" id="l1e" checked> weitere Summanden dazunehmen</label>
+        <div class="out" id="l1out"></div>
+      </div>
+    </div>
+    <p><b>Probieren Sie:</b> Vergrößern Sie den Ausschnitt. Ab wann liegen Graph und Leitterm praktisch aufeinander? Genau deshalb reicht der Leitterm für den Verlauf.</p>
+  </div>
+
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Stimmt „Je mehr, desto besser“ beim TourNord?</h3>
+    <p class="f">G(x) = −x^3 + 10x^2 − 3x − 54</p><div data-steps="b1"></div></div>
+
+  <div class="card prac"><span class="tag">Üben</span><h3>Steckbriefe und Deutungen</h3><div data-tasks="b1"></div></div>
+
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Wertetabelle erstellen</h3>
+      <ol>
+        <li><kbd>MENU</kbd> drücken, das Symbol <b>Tabellen</b> wählen (Taste <kbd>9</kbd>).</li>
+        <li>Bei <b>f(x)=</b> den Term eintippen. Das x erzeugen Sie mit der Taste <kbd>x</kbd>, Potenzen mit <kbd>x²</kbd>, <kbd>x³</kbd> oder <kbd>x^■</kbd>. Mit <kbd>=</kbd> bestätigen.</li>
+        <li>Bei <b>g(x)=</b> nichts eingeben, nur <kbd>=</kbd> drücken.</li>
+        <li><b>Start</b>, <b>Ende</b> und <b>Inkre</b> (Schrittweite) eingeben, jeweils mit <kbd>=</kbd>.</li>
+        <li>Mit den Pfeiltasten durch die Tabelle blättern. <kbd>AC</kbd> führt zurück zur Eingabe.</li>
+      </ol>
+      <p>Die Tabelle fasst höchstens 45 Zeilen, mit zwei Funktionen 30. Bei einer Fehlermeldung wählen Sie einen kleineren Bereich oder eine größere Schrittweite.</p>
+      <p>Für das Minus vor einem Term nehmen Sie die Taste <kbd>(−)</kbd>.</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Tippen Sie den Term in die Eingabezeile, zum Beispiel <code>f(x) = -x^3 + 10x^2 - 3x - 54</code>. Zoomen Sie mit dem Mausrad oder zwei Fingern weit heraus und prüfen Sie, wohin die Enden des Graphen zeigen.</p>
+      <p>Ein kleiner Ausschnitt kann täuschen. Verlassen Sie sich in der Klausur auf den Leitterm.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 1 prüfen</h3><div data-quiz="b1"></div></div>
+</section>
+
+<!-- ================= B2 ================= -->
+<section class="view" id="v-b2">
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Zwei Darstellungen, eine Funktion</h3>
+    <div class="tbl"><table>
+      <tr><th>Darstellung</th><th>allgemein</th><th>Das lesen Sie direkt ab</th></tr>
+      <tr><td>Polynomform</td><td>f(x) = a<sub>n</sub>x^n + … + a<sub>1</sub>x + a_0</td><td>Grad, Leitkoeffizient, y-Achsenabschnitt (0 | a_0)</td></tr>
+      <tr><td>Linearfaktorform</td><td>f(x) = a_n · (x − x_1) · (x − x_2) · …</td><td>alle Nullstellen und den Leitkoeffizienten</td></tr>
+    </table></div>
+    <ul class="tight">
+      <li><b>Satz vom Nullprodukt:</b> Ein Produkt ist null, wenn mindestens ein Faktor null ist.</li>
+      <li><b>Vorzeichen:</b> (x + 3) = (x − (−3)), die Nullstelle ist also x = −3.</li>
+      <li><b>Vielfachheit:</b> An einer einfachen Nullstelle schneidet der Graph die x-Achse. An einer doppelten Nullstelle wie bei (x − 1)^2 berührt er sie nur.</li>
+      <li><b>Umwandeln:</b> Linearfaktorform → Polynomform durch Ausmultiplizieren. Rückwärts brauchen Sie die Nullstellen (Baustein 3).</li>
+    </ul>
+  </div>
+  <div class="card lab"><span class="tag">Labor</span><h3>Nullstellen verschieben, beide Formen mitlesen</h3>
+    <div class="labgrid">
+      <div><canvas id="c2" role="img" aria-label="Graph einer Funktion dritten Grades mit einstellbaren Nullstellen"></canvas></div>
+      <div class="ctrl">
+        <label for="l2a">Leitkoeffizient a <output id="l2aO"></output></label><input type="range" id="l2a" min="-2" max="2" step="0.5" value="1">
+        <label for="l2r1">Nullstelle x_1 <output id="l2r1O"></output></label><input type="range" id="l2r1" min="-5" max="5" step="1" value="-2">
+        <label for="l2r2">Nullstelle x_2 <output id="l2r2O"></output></label><input type="range" id="l2r2" min="-5" max="5" step="1" value="1">
+        <label for="l2r3">Nullstelle x_3 <output id="l2r3O"></output></label><input type="range" id="l2r3" min="-5" max="5" step="1" value="4">
+        <div class="out" id="l2out"></div>
+      </div>
+    </div>
+    <p><b>Probieren Sie:</b> Schieben Sie zwei Nullstellen auf denselben Wert. Was passiert am Graphen und in der Linearfaktorform?</p>
+  </div>
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Die Gewinnfunktion des TourNord in zwei Formen</h3>
+    <p>Ein Analyst schickt: <span class="f">G(x) = −(x − 3)(x − 9)(x + 2)</span> Ist das dieselbe Funktion wie im Datenblatt?</p><div data-steps="b2"></div></div>
+  <div class="card prac"><span class="tag">Üben</span><h3>Ablesen, ausmultiplizieren, aufstellen</h3><div data-tasks="b2"></div></div>
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Ausmultiplizieren kontrollieren</h3>
+      <ol>
+        <li>Zwei Funktionen erlauben: <kbd>SHIFT</kbd> <kbd>MENU</kbd> (SETUP), mit der Pfeiltaste nach unten zu <b>Tabellen</b>, dann <b>f(x),g(x)</b> wählen.</li>
+        <li><kbd>MENU</kbd> → <b>Tabellen</b>. Bei f(x) die Linearfaktorform eingeben, bei g(x) Ihre Polynomform.</li>
+        <li>Start −3, Ende 3, Inkre 1.</li>
+        <li>Stimmen beide Spalten in jeder Zeile überein, haben Sie richtig ausmultipliziert.</li>
+      </ol>
+      <p>Schneller geht eine Stichprobe: einen Wert wie x = 1 in beide Formen einsetzen.</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Geben Sie beide Formen als <code>f(x)</code> und <code>g(x)</code> ein. Liegen die Graphen genau aufeinander, sind die Terme gleich. Der Befehl <code>Faktorisiere(f)</code> zeigt die Linearfaktoren, <code>Multipliziere(f)</code> die Polynomform.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 2 prüfen</h3><div data-quiz="b2"></div></div>
+</section>
+
+<!-- ================= B3a ================= -->
+<section class="view" id="v-b3a">
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Welches Nullstellen-Werkzeug passt?</h3>
+    <div class="tbl"><table>
+      <tr><th>So sieht der Term aus</th><th>Werkzeug</th><th>Station</th></tr>
+      <tr><td>Das absolute Glied fehlt, jeder Summand enthält x</td><td><b>Ausklammern</b></td><td>3a</td></tr>
+      <tr><td>Nur x^4, x^2 und eine Zahl</td><td><b>Substitution</b></td><td>3b</td></tr>
+      <tr><td>Alles andere ab Grad 3</td><td><b>Nullstelle raten und Polynomdivision</b></td><td>3c</td></tr>
+    </table></div>
+    <h4>Ausklammern in vier Schritten</h4>
+    <ol class="tight" style="padding-left:1.3em;margin:.3em 0">
+      <li>Funktionsterm gleich null setzen.</li>
+      <li>x oder die höchstmögliche Potenz von x ausklammern.</li>
+      <li>Satz vom Nullprodukt: x = 0 oder Klammer = 0.</li>
+      <li>Die Klammer lösen, bei Grad 2 mit der pq-Formel.</li>
+    </ol>
+    <p class="f">x^2 + px + q = 0 &nbsp;⇒&nbsp; x_1,2 = −p/2 ± √((p/2)^2 − q)</p>
+    <p class="warn"><b>Niemals durch x teilen.</b> Dabei geht die Nullstelle x = 0 verloren. Vor der pq-Formel immer durch den Faktor vor x^2 teilen.</p>
+  </div>
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Die Sättigungsmenge der Packtasche NordBag</h3>
+    <p>Erlösfunktion: <span class="f">E<sub>B</sub>(x) = −0,5x^3 + x^2 + 12x</span> Ab welcher Menge bringt die Tasche keinen Erlös mehr?</p><div data-steps="b3a"></div></div>
+  <div class="card prac"><span class="tag">Üben</span><h3>Nullstellen durch Ausklammern</h3><div data-tasks="b3a"></div></div>
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Gleichung 2. bis 4. Grades lösen lassen</h3>
+      <ol>
+        <li><kbd>MENU</kbd> drücken, <b>Gleichung/Funkt</b> wählen (Taste <kbd>A</kbd>, also die Taste <kbd>(−)</kbd>).</li>
+        <li><kbd>2</kbd> für <b>Polynom-Gleichung</b>, dann den Grad eintippen (2, 3 oder 4).</li>
+        <li>Die Koeffizienten der Reihe nach eingeben, jeweils mit <kbd>=</kbd>. Fehlt eine Potenz, tippen Sie <kbd>0</kbd> ein.</li>
+        <li>Mit <kbd>=</kbd> erscheinen nacheinander x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>.</li>
+      </ol>
+      <p>Beispiel NordBag: −0,5 | 1 | 12 | 0 liefert 6, −4 und 0.</p>
+      <p>Der Löser ist nur die Kontrolle. In der Klausur zählt der Rechenweg.</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Nach der Eingabe von <code>f(x) = …</code> liefert <code>Nullstelle(f)</code> alle Nullstellen als Punkte. Vergleichen Sie mit Ihrer Rechnung.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 3a prüfen</h3><div data-quiz="b3a"></div></div>
+</section>
+
+<!-- ================= B3b ================= -->
+<section class="view" id="v-b3b">
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Biquadratische Gleichungen</h3>
+    <p>Gleichungen der Form ax^4 + bx^2 + c = 0 enthalten nur die Exponenten 4, 2 und 0. Mit einer Ersetzung werden sie quadratisch.</p>
+    <div class="tbl"><table>
+      <tr><th>Schritt</th><th>Was Sie tun</th><th>allgemein</th></tr>
+      <tr><td>1 Substituieren</td><td>x^2 durch z ersetzen, dann ist x^4 = z^2</td><td>az^2 + bz + c = 0</td></tr>
+      <tr><td>2 Lösen</td><td>quadratische Gleichung mit der pq-Formel lösen</td><td>z_1 und z_2</td></tr>
+      <tr><td>3 Rücksubstituieren</td><td>aus jedem z wieder x bestimmen</td><td>x^2 = z ⇒ x = ±√z</td></tr>
+    </table></div>
+    <ul class="tight">
+      <li>z &gt; 0: zwei Lösungen x = +√z und x = −√z</li>
+      <li>z = 0: eine Lösung x = 0</li>
+      <li>z &lt; 0: keine Lösung</li>
+    </ul>
+  </div>
+  <div class="card lab"><span class="tag">Labor</span><h3>Wie viele Nullstellen hat x^4 + bx^2 + c?</h3>
+    <div class="labgrid">
+      <div><canvas id="c3" role="img" aria-label="Graph der biquadratischen Funktion"></canvas></div>
+      <div class="ctrl">
+        <label for="l3b">b <output id="l3bO"></output></label><input type="range" id="l3b" min="-13" max="5" step="1" value="-10">
+        <label for="l3c">c <output id="l3cO"></output></label><input type="range" id="l3c" min="-10" max="40" step="1" value="9">
+        <div class="out" id="l3out"></div>
+      </div>
+    </div>
+    <p><b>Probieren Sie:</b> Finden Sie Einstellungen mit vier, zwei und keiner Nullstelle. Woran erkennen Sie das an z_1 und z_2?</p>
+  </div>
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Das Rahmendekor des TourNord</h3>
+    <p>Die Designabteilung beschreibt eine Dekorlinie durch <span class="f">f(x) = 0,5x^4 − 10x^2 + 32</span> (x und y in cm). Wo trifft sie die Grundlinie?</p><div data-steps="b3b"></div></div>
+  <div class="card prac"><span class="tag">Üben</span><h3>Nullstellen durch Substitution</h3><div data-tasks="b3b"></div></div>
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Kontrolle mit Grad 4</h3>
+      <ol>
+        <li><kbd>MENU</kbd> → <b>Gleichung/Funkt</b> → <kbd>2</kbd> Polynom-Gleichung → Grad <kbd>4</kbd>.</li>
+        <li>Fünf Koeffizienten eingeben. Für die fehlenden Potenzen x<sup>3</sup> und x tippen Sie <kbd>0</kbd>.</li>
+        <li>Beispiel Rahmendekor: 0,5 | 0 | −10 | 0 | 32.</li>
+      </ol>
+      <p>Zeigt der Rechner eine Lösung mit einem <b>i</b> an, ist sie keine reelle Zahl. Sie zählt nicht als Nullstelle.</p>
+      <p>Die Zwischenschritte mit z prüfen Sie über Grad 2: 1 | −20 | 64.</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Zeichnen Sie f und zählen Sie die Schnittpunkte mit der x-Achse. Berührt der Graph die Achse nur, war der Ausdruck unter der Wurzel null und die Nullstelle ist doppelt.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 3b prüfen</h3><div data-quiz="b3b"></div></div>
+</section>
+
+<!-- ================= B3c ================= -->
+<section class="view" id="v-b3c">
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Raten, dividieren, Restpolynom lösen</h3>
+    <ol class="tight" style="padding-left:1.3em;margin:.3em 0">
+      <li><b>Eine Nullstelle x_1 raten:</b> Probieren Sie die Teiler des absoluten Glieds (±1, ±2, ±3, …). Die Wertetabelle des Taschenrechners hilft.</li>
+      <li><b>Dividieren:</b> f(x) : (x − x_1). Der Rest muss 0 sein, das Ergebnis hat einen um 1 kleineren Grad.</li>
+      <li><b>Restpolynom lösen:</b> bei Grad 2 mit der pq-Formel.</li>
+    </ol>
+    <p class="warn"><b>Zwei Stolpersteine:</b> Beim Abziehen drehen sich alle Vorzeichen in der Klammer um. Fehlt eine Potenz, schreiben Sie sie mit 0 als Platzhalter, zum Beispiel x^3 + 0x^2 − 7x + 6.</p>
+  </div>
+  <div class="card lab"><span class="tag">Labor</span><h3>Polynomdivision Schritt für Schritt</h3>
+    <div class="row">
+      <label for="dvP"><b>Funktion</b></label>
+      <select id="dvP" style="border:1.5px solid var(--line);border-radius:10px;padding:7px 8px;background:#fff;max-width:100%"></select>
+      <label for="dvR"><b>geratene Nullstelle x<sub>1</sub> =</b></label>
+      <input type="text" id="dvR" value="3" style="width:70px;border:1.5px solid var(--line);border-radius:10px;padding:7px 10px">
+      <button class="btn" id="dvGo" type="button">Prüfen und dividieren</button>
+    </div>
+    <div id="dvOut" style="margin-top:12px"></div>
+  </div>
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Gewinnschwelle und Gewinngrenze des TourNord</h3>
+    <p class="f">G(x) = −x^3 + 10x^2 − 3x − 54</p><div data-steps="b3c"></div></div>
+  <div class="card prac"><span class="tag">Üben</span><h3>Nullstellen mit Polynomdivision</h3>
+    <p>Rechnen Sie auf Papier. Mit dem Labor oben können Sie Ihre Division danach Zeile für Zeile vergleichen.</p><div data-tasks="b3c"></div></div>
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Nullstelle schnell finden</h3>
+      <ol>
+        <li><kbd>MENU</kbd> → <b>Tabellen</b>, den Term bei f(x) eingeben.</li>
+        <li>Start −5, Ende 10, Inkre 1.</li>
+        <li>Suchen Sie eine Zeile mit f(x) = 0. Das ist Ihre geratene Nullstelle.</li>
+        <li>Finden Sie keine, achten Sie auf einen Vorzeichenwechsel. Dazwischen liegt eine Nullstelle, die nicht ganzzahlig ist.</li>
+      </ol>
+      <p>Schreiben Sie in der Klausur die Probe hin, zum Beispiel G(3) = −27 + 90 − 9 − 54 = 0.</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Der Befehl <code>Division(-x^3 + 10x^2 - 3x - 54, x - 3)</code> liefert Ergebnis und Rest. <code>Nullstelle(f)</code> zeigt alle Nullstellen auf einmal.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 3c prüfen</h3><div data-quiz="b3c"></div></div>
+</section>
+
+<!-- ================= B4 ================= -->
+<section class="view" id="v-b4">
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Achsen- und Punktsymmetrie</h3>
+    <div class="tbl"><table>
+      <tr><th></th><th>Achsensymmetrie zur y-Achse</th><th>Punktsymmetrie zum Ursprung</th></tr>
+      <tr><th>Bedingung</th><td>f(−x) = f(x) für alle x</td><td>f(−x) = −f(x) für alle x</td></tr>
+      <tr><th>Anschaulich</th><td>Der Graph lässt sich an der y-Achse spiegeln.</td><td>Der Graph geht bei einer Drehung um 180° um O(0 | 0) in sich über.</td></tr>
+      <tr><th>Am Term</th><td>nur gerade Exponenten, auch a_0 zählt dazu (a_0 = a_0 · x^0)</td><td>nur ungerade Exponenten, also kein absolutes Glied</td></tr>
+    </table></div>
+    <ul class="tight">
+      <li>Kommen gerade und ungerade Exponenten vor, liegt keine der beiden Symmetrien vor.</li>
+      <li>Rechenregel: (−x)^4 = x^4, aber (−x)^3 = −x^3.</li>
+      <li>Produkte erst ausmultiplizieren, dann die Exponenten prüfen.</li>
+    </ul>
+  </div>
+  <div class="card lab"><span class="tag">Labor</span><h3>Koeffizienten ein- und ausschalten</h3>
+    <div class="labgrid">
+      <div><canvas id="c4" role="img" aria-label="Graph mit Spiegelbild an der y-Achse und Drehbild um den Ursprung"></canvas>
+        <div class="legend"><span><i style="border-color:#6d3bf5"></i>f(x)</span><span><i style="border-color:#0aa6a0;border-top-style:dashed"></i>Spiegelbild an der y-Achse</span><span><i style="border-color:#f0456a;border-top-style:dotted"></i>Drehbild um 180°</span></div></div>
+      <div class="ctrl">
+        <label for="l4a4">a_4 (vor x^4) <output id="l4a4O"></output></label><input type="range" id="l4a4" min="-1" max="1" step="0.25" value="0.25">
+        <label for="l4a3">a_3 (vor x^3) <output id="l4a3O"></output></label><input type="range" id="l4a3" min="-1" max="1" step="0.25" value="0">
+        <label for="l4a2">a_2 (vor x^2) <output id="l4a2O"></output></label><input type="range" id="l4a2" min="-3" max="3" step="0.5" value="-2">
+        <label for="l4a1">a_1 (vor x) <output id="l4a1O"></output></label><input type="range" id="l4a1" min="-3" max="3" step="0.5" value="0">
+        <label for="l4a0">a_0 <output id="l4a0O"></output></label><input type="range" id="l4a0" min="-3" max="3" step="0.5" value="1">
+        <label class="chk" for="l4m"><input type="checkbox" id="l4m" checked> Spiegelbild an der y-Achse zeigen</label>
+        <label class="chk" for="l4d"><input type="checkbox" id="l4d"> Drehbild um 180° zeigen</label>
+        <div class="out" id="l4out"></div>
+      </div>
+    </div>
+    <p><b>Probieren Sie:</b> Liegt ein Bild genau auf dem Graphen, hat f diese Symmetrie. Stellen Sie a_3 auf einen Wert ungleich 0 und beobachten Sie das Spiegelbild.</p>
+  </div>
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Symmetrie rechnerisch nachweisen</h3><div data-steps="b4"></div></div>
+  <div class="card prac"><span class="tag">Üben</span><h3>Erkennen, nachweisen, nutzen</h3><div data-tasks="b4"></div></div>
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Vermutung mit der Wertetabelle prüfen</h3>
+      <ol>
+        <li><kbd>MENU</kbd> → <b>Tabellen</b>, Term eingeben.</li>
+        <li>Start −3, Ende 3, Inkre 1.</li>
+        <li>Vergleichen Sie die Werte bei −3 und 3, bei −2 und 2, bei −1 und 1.</li>
+      </ol>
+      <p>Gleiche Werte sprechen für Achsensymmetrie, Werte mit umgekehrtem Vorzeichen für Punktsymmetrie. Die Tabelle ist nur ein Hinweis. Der Nachweis gelingt erst mit f(−x).</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Zeichnen Sie f und zusätzlich <code>g(x) = f(-x)</code>. Decken sich beide Graphen, ist f achsensymmetrisch. Für die Punktsymmetrie vergleichen Sie f mit <code>h(x) = -f(-x)</code>.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 4 prüfen</h3><div data-quiz="b4"></div></div>
+</section>
+
+<!-- ================= B5 ================= -->
+<section class="view" id="v-b5">
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Ökonomische Funktionen im Überblick</h3>
+    <div class="tbl"><table>
+      <tr><th>Funktion</th><th>Term</th><th>Bedeutung</th></tr>
+      <tr><td>Preis-Absatz-Funktion</td><td>p(x) = −m · x + b</td><td>Preis, zu dem x ME abgesetzt werden. Höchstpreis p(0) = b, Sättigungsmenge bei p(x) = 0.</td></tr>
+      <tr><td>Erlösfunktion</td><td>E(x) = p(x) · x</td><td>Umsatz beim Absatz von x ME</td></tr>
+      <tr><td>Kostenfunktion</td><td>K(x) = K_v(x) + K_f</td><td>Gesamtkosten. Das absolute Glied sind die Fixkosten.</td></tr>
+      <tr><td>Gewinnfunktion</td><td>G(x) = E(x) − K(x)</td><td>Gewinn bei G(x) &gt; 0, Verlust bei G(x) &lt; 0</td></tr>
+    </table></div>
+    <ul class="tight">
+      <li><b>Gewinnschwelle:</b> kleinere positive Nullstelle von G. Dort schneiden sich E und K zum ersten Mal.</li>
+      <li><b>Gewinngrenze:</b> größere positive Nullstelle von G. Dazwischen liegt die Gewinnzone.</li>
+      <li><b>Gewinnmaximum:</b> ohne Differenzialrechnung näherungsweise mit einer Wertetabelle in kleinen Schritten.</li>
+    </ul>
+    <p class="warn"><b>Klammer setzen:</b> G(x) = E(x) − (K(x)). Das Minus gilt für alle Summanden von K.</p>
+  </div>
+
+  <div class="card lab"><span class="tag">Labor</span><h3>Erlös, Kosten und Gewinn des TourNord</h3>
+    <div class="labgrid">
+      <div><canvas id="c5" style="height:380px" role="img" aria-label="Erlös-, Kosten- und Gewinnfunktion mit markierter Gewinnzone"></canvas>
+        <div class="legend"><span><i style="border-color:#0b8a5f"></i>E(x) Erlös</span><span><i style="border-color:#f0456a;border-top-style:dashed"></i>K(x) Kosten</span><span><i style="border-color:#6d3bf5;border-top-width:4px"></i>G(x) Gewinn</span><span><i style="border-color:#b97400;border-top-style:dotted"></i>p(x) Preis</span><span><i style="border-color:#bfeee0;border-top-width:10px"></i>Gewinnzone</span></div></div>
+      <div class="ctrl">
+        <label for="l5b">Höchstpreis b <output id="l5bO"></output></label><input type="range" id="l5b" min="40" max="70" step="1" value="60">
+        <label for="l5m">Preis sinkt je ME um m <output id="l5mO"></output></label><input type="range" id="l5m" min="1" max="4" step="0.5" value="2">
+        <label for="l5f">Fixkosten K_f <output id="l5fO"></output></label><input type="range" id="l5f" min="0" max="150" step="2" value="54">
+        <label for="l5x">Menge x ablesen <output id="l5xO"></output></label><input type="range" id="l5x" min="0" max="14" step="0.1" value="6.5">
+        <label class="chk" for="l5p"><input type="checkbox" id="l5p"> Preis-Absatz-Funktion zeigen</label>
+        <button class="btn ghost small" id="l5r" type="button">Datenblatt TourNord wiederherstellen</button>
+        <div class="out" id="l5out"></div>
+      </div>
+    </div>
+    <p><b>Probieren Sie:</b> Erhöhen Sie die Fixkosten. Wie bewegen sich Kostenkurve, Gewinnkurve und Gewinnzone? Ab welchen Fixkosten gibt es gar keine Gewinnzone mehr?</p>
+  </div>
+
+  <div class="card ex"><span class="tag">Beispiel</span><h3>Das Controlling-Modell für den TourNord</h3>
+    <p><span class="f">p(x) = 60 − 2x</span> <span class="f">K(x) = x^3 − 12x^2 + 63x + 54</span></p><div data-steps="b5"></div></div>
+  <div class="card prac"><span class="tag">Üben</span><h3>Der E-Scooter ScootNord</h3>
+    <p>Für den ScootNord gelten (x in ME, 1 ME = 100 Scooter, Werte in GE, 1 GE = 10.000 €):</p>
+    <p><span class="f">p(x) = 30 − x</span> <span class="f">K(x) = x^3 − 7x^2 + 21x + 14</span></p>
+    <div data-tasks="b5"></div></div>
+
+  <div class="card info"><span class="tag">Kurz erklärt</span><h3>Seitenblick: die Produktionsfunktion</h3>
+    <p>Eine Produktionsfunktion ordnet dem Input r (zum Beispiel Arbeitsstunden) den Output x zu. Beim ertragsgesetzlichen Verlauf (Grad 3, a_3 &lt; 0) steigt der Output erst immer stärker, dann schwächer bis zum Ertragsmaximum, danach sinkt er.</p>
+    <ul class="tight"><li>Ohne Input kein Output: x(0) = 0. Das absolute Glied fehlt, die Nullstellen finden Sie durch Ausklammern.</li>
+    <li>Ökonomisch sinnvoll ist nur der Bereich von r = 0 bis zum Ertragsmaximum.</li></ul>
+    <h4>Die Rahmenschweißerei</h4>
+    <p><span class="f">x(r) = −0,05r^3 + 0,6r^2 + 0,65r</span> (r in FE, 1 FE = 1.000 Arbeitsstunden, x in ME = 100 Rahmen)</p>
+    <div class="labgrid">
+      <div><canvas id="c6" style="height:260px" role="img" aria-label="Graph der Produktionsfunktion"></canvas></div>
+      <div class="ctrl">
+        <label for="l6r">Input r <output id="l6rO"></output></label><input type="range" id="l6r" min="0" max="13" step="0.5" value="4">
+        <div class="out" id="l6out"></div>
+      </div>
+    </div>
+    <div data-tasks="b5p"></div>
+  </div>
+
+  <div class="two">
+    <div class="card tr"><span class="tag">Casio fx-991DE X</span><h3>Gewinnzone und Gewinnmaximum</h3>
+      <ol>
+        <li><b>Gewinnschwelle prüfen:</b> In der Wertetabelle f(x) = E(x) und g(x) = K(x) eingeben. Wo beide Spalten gleich sind, ist G(x) = 0.</li>
+        <li><b>Gewinnmaximum eingrenzen:</b> f(x) = G(x), Start 0, Ende 11, Inkre 1. Suchen Sie den größten Wert.</li>
+        <li><b>Verfeinern:</b> Um diese Stelle herum neu rechnen, zum Beispiel Start 5, Ende 8, Inkre 0,5.</li>
+        <li><b>Preis dazu:</b> Die gefundene Menge in p(x) einsetzen.</li>
+      </ol>
+      <p>Notieren Sie in der Klausur einen Ausschnitt der Tabelle mit den Nachbarwerten. So ist Ihr Näherungswert begründet.</p>
+    </div>
+    <div class="card gg"><span class="tag">GeoGebra-Check</span><h3>Zu Hause kontrollieren</h3>
+      <p>Geben Sie E, K und G ein. <code>Schneide(E, K)</code> liefert die Grenzen der Gewinnzone, <code>Extremum(G)</code> das Gewinnmaximum. Der Wert aus Ihrer Wertetabelle darf davon leicht abweichen.</p>
+    </div>
+  </div>
+  <div class="card quiz"><span class="tag">Quiz</span><h3>Baustein 5 prüfen</h3><div data-quiz="b5"></div></div>
+</section>
+
+<!-- ================= CHECK ================= -->
+<section class="view" id="v-check">
+  <div class="card info"><span class="tag">Merkzettel</span><h3>Das Wichtigste auf einen Blick</h3>
+    <div class="tbl"><table>
+      <tr><th>Frage</th><th>So gehen Sie vor</th></tr>
+      <tr><td>Verlauf für x → ±∞</td><td>Leitterm bestimmen: Grad gerade oder ungerade? Leitkoeffizient positiv oder negativ?</td></tr>
+      <tr><td>Nullstellen, absolutes Glied fehlt</td><td>Ausklammern, Nullprodukt, pq-Formel</td></tr>
+      <tr><td>Nullstellen, nur x^4, x^2, Zahl</td><td>Substitution z = x^2, pq-Formel, Rücksubstitution mit ±</td></tr>
+      <tr><td>Nullstellen, sonst</td><td>Nullstelle raten (Probe notieren), Polynomdivision, pq-Formel</td></tr>
+      <tr><td>Symmetrie</td><td>Exponenten prüfen, dann mit f(−x) nachweisen</td></tr>
+      <tr><td>Gewinnfunktion</td><td>E(x) = p(x) · x, dann G(x) = E(x) − (K(x)) mit Klammer</td></tr>
+      <tr><td>Gewinnzone</td><td>zwischen den positiven Nullstellen von G</td></tr>
+      <tr><td>Gewinnmaximum</td><td>Wertetabelle mit kleiner Schrittweite, Preis mit p(x)</td></tr>
+    </table></div>
+    <p>Ergebnisse immer ökonomisch deuten, mit Stück und Euro.</p>
+  </div>
+  <div class="card quiz"><span class="tag">Klausur-Check</span><h3>Zwölf gemischte Fragen</h3>
+    <p>Legen Sie Papier, Stift und Taschenrechner bereit. Einige Fragen brauchen eine kurze Rechnung.</p>
+    <div data-quiz="check"></div></div>
+  <div class="card"><h3>Ihre Selbsteinschätzung</h3><div id="overview"></div>
+    <p style="margin-top:12px"><button class="btn ghost small" id="reset" type="button">Fortschritt zurücksetzen</button> <span id="resetMsg" style="color:var(--muted)"></span></p></div>
+</section>
+
+</main>
+
+<script>
+(function(){
+'use strict';
+/* ---------- Helfer ---------- */
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const M=s=>String(s).replace(/\^\{([^}]+)\}/g,'<sup>$1</sup>').replace(/\^(\d+|n)/g,'<sup>$1</sup>').replace(/_(\d(?:,\d)?|[nfv])(?![\w])/g,'<sub>$1</sub>');
+const N=(x,d)=>Math.abs(+x).toLocaleString('de-DE',{maximumFractionDigits:d==null?3:d});
+const Z=(x,d)=>{const r=+(+x).toFixed(d==null?3:d);return (r<0?'−':'')+N(r,d)};
+const ev=(c,x)=>c.reduce((s,a)=>s*x+a,0);
+const mul=(p,q)=>{const r=new Array(p.length+q.length-1).fill(0);p.forEach((a,i)=>q.forEach((b,j)=>r[i+j]+=a*b));return r};
+function P(c,v){v=v||'x';let s='';const n=c.length-1;c.forEach((a,i)=>{a=+(+a).toFixed(6);if(!a)return;const d=n-i,ab=Math.abs(a);const t=(ab===1&&d>0?'':N(ab))+(d>0?v+(d>1?'<sup>'+d+'</sup>':''):'');s+=s?(a<0?' − ':' + ')+t:(a<0?'−':'')+t});return s||'0'}
+const SUP={2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶'};
+function PT(c,keepZero){let s='';const n=c.length-1;c.forEach((a,i)=>{a=+(+a).toFixed(6);if(!a&&!(keepZero&&i>0))return;const d=n-i,ab=Math.abs(a);const t=((ab===1&&d>0)?'':N(ab))+(d>0?'x'+(d>1?SUP[d]:''):'');s+=s?(a<0?' − ':' + ')+t:(a<0?'−':'')+t});return s||'0'}
+const num=s=>{s=String(s).trim().replace(/[−–—]/g,'-').replace(/\s/g,'').replace(',','.');return s===''?NaN:Number(s)};
+const near=(a,b,t)=>Math.abs(a-b)<=(t==null?0.011:t);
+function realRoots(f,a,b,st){const r=[];let x0=a,y0=f(a);for(let x=a+st;x<=b+1e-9;x+=st){const y=f(x);if(y0===0)r.push(x0);else if(y0*y<0){let lo=x0,hi=x,fl=y0;for(let i=0;i<50;i++){const m=(lo+hi)/2,fm=f(m);if(fl*fm<=0)hi=m;else{lo=m;fl=fm}}r.push((lo+hi)/2)}x0=x;y0=y}return r}
+
+/* ---------- Speicher ---------- */
+const KEY='gbGanzrational_v1';
+function norm(t){const o={quiz:{},self:{},ans:{}};if(!t||typeof t!=='object')return o;
+ Object.keys(t.quiz||{}).forEach(k=>{const q=t.quiz[k];if(/^[a-z0-9]+$/.test(k)&&q)o.quiz[k]={r:Math.max(0,Math.min(99,q.r|0)),n:Math.max(0,Math.min(99,q.n|0))}});
+ Object.keys(t.self||{}).forEach(k=>{if(/^[a-z0-9]+$/.test(k)&&/^(pp|p|m|mm)$/.test(t.self[k]))o.self[k]=t.self[k]});
+ Object.keys(t.ans||{}).forEach(k=>{const v=t.ans[k];if(!/^[a-z0-9]+:\d+$/.test(k))return;if(typeof v==='number')o.ans[k]=v|0;else if(Array.isArray(v))o.ans[k]=v.slice(0,8).map(x=>String(x==null?'':x).slice(0,40))});
+ return o}
+let S=norm(null);
+try{S=norm(JSON.parse(localStorage.getItem(KEY)||'null'))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+
+/* ---------- Stationen ---------- */
+const ST=[
+{id:'start',n:'Start',t:'Die Mission'},
+{id:'b1',n:'1',t:'Wohin läuft der Graph?',s:'Verlauf für x → ±∞',can:'den Verlauf für x → ±∞ am Leitterm ablesen und ökonomisch deuten.'},
+{id:'b2',n:'2',t:'Zwei Gesichter einer Funktion',s:'Linearfaktor- und Polynomform',can:'Linearfaktor- und Polynomdarstellung ineinander umwandeln.'},
+{id:'b3a',n:'3a',t:'Werkzeug 1: Ausklammern',s:'Nullstellen ohne absolutes Glied',can:'Nullstellen durch Ausklammern berechnen.'},
+{id:'b3b',n:'3b',t:'Werkzeug 2: Substitution',s:'Biquadratische Gleichungen',can:'Nullstellen durch Substitution berechnen.'},
+{id:'b3c',n:'3c',t:'Werkzeug 3: Polynomdivision',s:'Gewinnschwelle und Gewinngrenze',can:'Nullstellen mit der Polynomdivision berechnen.'},
+{id:'b4',n:'4',t:'Spieglein, Spieglein',s:'Achsen- und Punktsymmetrie',can:'Achsen- und Punktsymmetrie erkennen und nachweisen.'},
+{id:'b5',n:'5',t:'Kosten, Erlös, Gewinn',s:'Mit Preis-Absatz-Funktion',can:'Erlös-, Kosten- und Gewinnfunktion aufstellen und auswerten.'},
+{id:'check',n:'Klausur-Check',t:'Klausur-Check',s:'Alles gemischt'}];
+const QUIZ_IDS=['b1','b2','b3a','b3b','b3c','b4','b5','check'];
+
+/* ---------- Inhalte: Beispiele ---------- */
+const TOUR=[-1,10,-3,-54];
+const tbl=(xs,rows)=>'<div class="tbl"><table><tr><th>x</th>'+xs.map(x=>'<td class="num">'+Z(x)+'</td>').join('')+'</tr>'+rows.map(r=>'<tr><th>'+r[0]+'</th>'+xs.map(x=>'<td class="num">'+Z(r[1](x),1)+'</td>').join('')+'</tr>').join('')+'</table></div>';
+const STEPS={
+b1:[
+ 'Leitterm bestimmen: Der Summand mit der höchsten Potenz ist −x^3. Also Grad n = 3 (ungerade) und Leitkoeffizient a_3 = −1 (negativ).',
+ 'Fall zuordnen: n ungerade und a_n &lt; 0. Der Graph verläuft von links oben nach rechts unten.',
+ 'Mathematisch notieren: Für x → −∞ gilt G(x) → +∞. Für x → +∞ gilt G(x) → −∞.',
+ 'Ökonomisch deuten: Negative Mengen gibt es nicht, wichtig ist nur x → +∞. Bei sehr großen Mengen entstehen immer höhere Verluste. Schon an der Kapazitätsgrenze gilt G(11) = −1331 + 1210 − 33 − 54 = −208 GE, das sind 2,08 Mio. € Verlust. „Je mehr, desto besser“ stimmt also nicht.'],
+b2:[
+ 'Nullstellen ablesen: x_1 = 3, x_2 = 9, x_3 = −2.',
+ 'Zwei Klammern ausmultiplizieren: (x − 3)(x − 9) = x^2 − 9x − 3x + 27 = x^2 − 12x + 27',
+ 'Mit der dritten Klammer multiplizieren: (x^2 − 12x + 27)(x + 2) = x^3 + 2x^2 − 12x^2 − 24x + 27x + 54 = x^3 − 10x^2 + 3x + 54',
+ 'Den Vorfaktor −1 einbeziehen: G(x) = −(x^3 − 10x^2 + 3x + 54) = −x^3 + 10x^2 − 3x − 54. Das ist die Funktion aus dem Datenblatt.',
+ 'Ökonomisch deuten: Bei x = 3 (300 Räder) beginnt die Gewinnzone, bei x = 9 (900 Räder) endet sie. Die Nullstelle x = −2 ist ökonomisch nicht relevant.'],
+b3a:[
+ 'Ansatz: E<sub>B</sub>(x) = 0, also −0,5x^3 + x^2 + 12x = 0',
+ 'Ausklammern: x · (−0,5x^2 + x + 12) = 0',
+ 'Nullprodukt: x_1 = 0 oder −0,5x^2 + x + 12 = 0. Die zweite Gleichung durch −0,5 teilen.',
+ 'Normalform: x^2 − 2x − 24 = 0, also p = −2 und q = −24',
+ 'pq-Formel: x_2,3 = 1 ± √(1 + 24) = 1 ± 5, also x_2 = 6 und x_3 = −4',
+ 'Deutung: Bei x = 0 wird nichts verkauft. Bei 6 ME (600 Taschen) ist die Sättigungsmenge erreicht. x = −4 ist ökonomisch nicht relevant.'],
+b3b:[
+ 'Ansatz: 0,5x^4 − 10x^2 + 32 = 0. Mit 2 multiplizieren: x^4 − 20x^2 + 64 = 0',
+ 'Substituieren mit x^2 = z: z^2 − 20z + 64 = 0',
+ 'pq-Formel: z_1,2 = 10 ± √(100 − 64) = 10 ± 6, also z_1 = 16 und z_2 = 4',
+ 'Rücksubstituieren: x^2 = 16 ergibt x = ±4. x^2 = 4 ergibt x = ±2.',
+ 'Deutung: Die Dekorlinie trifft die Grundlinie bei −4, −2, 2 und 4 cm.'],
+b3c:[
+ 'Raten: Teiler von 54 probieren. G(3) = −27 + 90 − 9 − 54 = 0. Also ist x_1 = 3 eine Nullstelle.',
+ 'Dividieren:<pre class="div">'+divText(TOUR,3,99)+'</pre>',
+ 'Restpolynom lösen: −x^2 + 7x + 18 = 0. Mit −1 multiplizieren: x^2 − 7x − 18 = 0. Dann x_2,3 = 3,5 ± √(12,25 + 18) = 3,5 ± 5,5, also x_2 = 9 und x_3 = −2.',
+ 'Kontrolle: G(x) = −(x − 3)(x − 9)(x + 2). Das ist die Form des Analysten aus Baustein 2.',
+ 'Deutung: Die Gewinnschwelle liegt bei 3 ME (300 Räder), die Gewinngrenze bei 9 ME (900 Räder). Dazwischen liegt die Gewinnzone.'],
+b4:[
+ '<b>f(x) = −x^4 + 3x^2 + 2</b> hat nur gerade Exponenten (4, 2, 0). Vermutung: achsensymmetrisch.',
+ 'Nachweis: f(−x) = −(−x)^4 + 3(−x)^2 + 2 = −x^4 + 3x^2 + 2 = f(x). Also ist f achsensymmetrisch zur y-Achse.',
+ '<b>g(x) = 2x^3 − 5x</b> hat nur ungerade Exponenten (3, 1). Vermutung: punktsymmetrisch.',
+ 'Nachweis: g(−x) = 2(−x)^3 − 5(−x) = −2x^3 + 5x = −(2x^3 − 5x) = −g(x). Also ist g punktsymmetrisch zum Ursprung.',
+ '<b>h(x) = x^4 − x</b> hat gerade und ungerade Exponenten. h(−x) = x^4 + x. Das ist weder h(x) noch −h(x) = −x^4 + x. Also liegt keine der beiden Symmetrien vor. Ein Gegenbeispiel genügt auch: h(1) = 0, aber h(−1) = 2.'],
+b5:[
+ 'Höchstpreis und Sättigungsmenge: p(0) = 60 GE/ME, das sind 6.000 € pro Rad (1 GE/ME = 100 € pro Rad). Aus 60 − 2x = 0 folgt x = 30 ME.',
+ 'Erlösfunktion: E(x) = (60 − 2x) · x = −2x^2 + 60x',
+ 'Gewinnfunktion mit Klammer: G(x) = −2x^2 + 60x − (x^3 − 12x^2 + 63x + 54) = −2x^2 + 60x − x^3 + 12x^2 − 63x − 54 = −x^3 + 10x^2 − 3x − 54',
+ 'Nullstellen aus Baustein 3c: Gewinnschwelle 3 ME, Gewinngrenze 9 ME. Probe: E(3) = −18 + 180 = 162 und K(3) = 27 − 108 + 189 + 54 = 162.',
+ 'Gewinnmaximum mit der Wertetabelle (Schrittweite 0,5):'+tbl([5,5.5,6,6.5,7,7.5,8],[['G(x)',x=>ev(TOUR,x)]])+'Das Maximum liegt bei ca. 6,5 ME (650 Räder) mit ca. 74 GE, also rund 740.000 € Gewinn. Zugehöriger Preis: p(6,5) = 60 − 13 = 47 GE/ME, das sind 4.700 € pro Rad.',
+ 'Kapazitätsgrenze: G(11) = −208 GE. Wer die Kapazität voll ausschöpft, macht rund 2,08 Mio. € Verlust.']
+};
+
+/* ---------- Inhalte: Aufgaben ---------- */
+const INF=['+∞','−∞'], SYM=['achsensymmetrisch zur y-Achse','punktsymmetrisch zum Ursprung','keine von beiden'];
+const vf=(l,r)=>[{l:'x → −∞: f(x) →',a:l,o:INF},{l:'x → +∞: f(x) →',a:r,o:INF}];
+const TASKS={
+b1:[
+ {q:'Füllen Sie den Steckbrief aus: <b>f(x) = −3x^4 + 2x^3 − 7</b>',type:'fields',f:[{l:'Grad n',a:4},{l:'Leitkoeffizient',a:-3},{l:'absolutes Glied',a:-7}].concat(vf('−∞','−∞')),sol:'Leitterm −3x^4: Grad 4 (gerade), Leitkoeffizient −3 (negativ). Der Graph verläuft von links unten nach rechts unten.'},
+ {q:'Achtung, nicht sortiert: <b>f(x) = 5x − 0,5x^3 + 2x^2</b>',type:'fields',f:[{l:'Grad n',a:3},{l:'Leitkoeffizient',a:-0.5},{l:'absolutes Glied',a:0}].concat(vf('+∞','−∞')),sol:'Der Leitterm ist −0,5x^3, auch wenn er in der Mitte steht. Das absolute Glied ist 0. Grad ungerade, Leitkoeffizient negativ: von links oben nach rechts unten.'},
+ {q:'Produktform: <b>f(x) = 2(x − 1)(x + 3)^2</b>',type:'fields',f:[{l:'Grad n',a:3},{l:'Leitkoeffizient',a:2},{l:'absolutes Glied f(0)',a:-18}].concat(vf('−∞','+∞')),sol:'Leitterm: 2 · x · x^2 = 2x^3. Absolutes Glied: f(0) = 2 · (−1) · 3^2 = −18. Grad ungerade, Leitkoeffizient positiv: von links unten nach rechts oben.'},
+ {q:'<b>f(x) = x^2 − 0,01x^6 + 500</b>',type:'fields',f:[{l:'Grad n',a:6},{l:'Leitkoeffizient',a:-0.01},{l:'absolutes Glied',a:500}].concat(vf('−∞','−∞')),sol:'Leitterm −0,01x^6. Auch ein sehr kleiner Leitkoeffizient setzt sich für große x durch: Grad gerade, Leitkoeffizient negativ, beide Enden zeigen nach unten.'},
+ {q:'Für eine Scooter-Halterung gibt es zwei Gewinnmodelle: G_1(x) = 0,1x^3 − 2x^2 + 30x − 40 und G_2(x) = −0,1x^3 + 2x^2 + 3x − 40. Welches ist ökonomisch plausibel?',type:'mc',o:['G_1, weil der Gewinn mit der Menge immer weiter wächst','G_2, weil der Gewinn für sehr große Mengen negativ wird','Beide, der Leitterm spielt ökonomisch keine Rolle'],a:1,sol:'Bei G_1 gilt für x → +∞: G_1(x) → +∞. Der Gewinn würde unbegrenzt wachsen. Das passt nicht, weil Preise mit der Menge sinken und Kosten überproportional steigen. Bei G_2 gilt G_2(x) → −∞.'},
+ {q:'Kostenfunktion des TourNord: K(x) = x^3 − 12x^2 + 63x + 54. Was bedeutet die 54?',type:'mc',o:['Die Kosten pro Rad betragen 54 €.','Die Fixkosten betragen 54 GE, also 540.000 €.','Ab 54 ME entstehen Verluste.'],a:1,sol:'K(0) = 54. Das absolute Glied sind die Fixkosten. Sie fallen auch ohne Produktion an: 54 GE = 540.000 €.'}],
+b2:[
+ {q:'Geben Sie die Nullstellen an: <b>f(x) = 3(x − 2)(x + 5)</b>',type:'roots',ans:[2,-5],p:[3,9,-30],sol:'Aus (x − 2) folgt x = 2, aus (x + 5) folgt x = −5.'},
+ {q:'Multiplizieren Sie aus: <b>f(x) = 3(x − 2)(x + 5)</b> = ■x^2 + ■x + ■',type:'fields',f:[{l:'vor x²',a:3},{l:'vor x',a:9},{l:'absolutes Glied',a:-30}],sol:'(x − 2)(x + 5) = x^2 + 5x − 2x − 10 = x^2 + 3x − 10. Mal 3: 3x^2 + 9x − 30.'},
+ {q:'Multiplizieren Sie aus: <b>g(x) = −0,5(x + 1)(x − 1)(x − 4)</b>',type:'fields',f:[{l:'vor x³',a:-0.5},{l:'vor x²',a:2},{l:'vor x',a:0.5},{l:'absolutes Glied',a:-2}],tip:'(x + 1)(x − 1) ist eine binomische Formel.',sol:'(x + 1)(x − 1) = x^2 − 1. Dann (x^2 − 1)(x − 4) = x^3 − 4x^2 − x + 4. Mal −0,5 für jeden Summanden: −0,5x^3 + 2x^2 + 0,5x − 2.'},
+ {q:'Multiplizieren Sie aus: <b>h(x) = x(x + 2)^2</b>',type:'fields',f:[{l:'vor x³',a:1},{l:'vor x²',a:4},{l:'vor x',a:4},{l:'absolutes Glied',a:0}],sol:'(x + 2)^2 = x^2 + 4x + 4 (binomische Formel, nicht x^2 + 4). Mal x: x^3 + 4x^2 + 4x.'},
+ {q:'Wie verhält sich der Graph von h(x) = x(x + 2)^2 an der Stelle x = −2?',type:'mc',o:['Er schneidet die x-Achse.','Er berührt die x-Achse nur.','Er hat dort keine Nullstelle.'],a:1,sol:'Der Faktor (x + 2) kommt doppelt vor. An einer doppelten Nullstelle berührt der Graph die x-Achse.'},
+ {q:'Eine Funktion 3. Grades hat die Nullstellen −2, 1 und 3. Ihr Graph schneidet die y-Achse in (0 | −12). Bestimmen Sie den Leitkoeffizienten a.',type:'fields',f:[{l:'a',a:-2}],tip:'Setzen Sie x = 0 in f(x) = a(x + 2)(x − 1)(x − 3) ein.',sol:'f(0) = a · 2 · (−1) · (−3) = 6a. Aus 6a = −12 folgt a = −2. Also f(x) = −2(x + 2)(x − 1)(x − 3).'},
+ {q:'Die Erlösfunktion des TourNord lautet E(x) = −2x(x − 30). Geben Sie die Nullstellen an.',type:'roots',ans:[0,30],p:[-2,60,0],sol:'x = 0: Es wird nichts verkauft. x = 30: Der Preis p(30) = 60 − 60 = 0, die Sättigungsmenge ist erreicht.'}],
+b3a:[
+ {q:'<b>f(x) = x^3 − 16x</b>',type:'roots',ans:[0,4,-4],p:[1,0,-16,0],sol:'x(x^2 − 16) = 0. Also x = 0 oder x^2 = 16, das heißt x = 4 oder x = −4.'},
+ {q:'<b>f(x) = 3x^3 − 6x^2 − 24x</b>',type:'roots',ans:[0,4,-2],p:[3,-6,-24,0],sol:'3x(x^2 − 2x − 8) = 0. pq-Formel: x = 1 ± √(1 + 8) = 1 ± 3, also x = 4 oder x = −2. Dazu x = 0.'},
+ {q:'<b>f(x) = x^4 + 2x^3</b>',type:'roots',ans:[0,-2],p:[1,2,0,0,0],tip:'Klammern Sie die höchstmögliche Potenz aus.',sol:'x^3(x + 2) = 0. Also x = 0 (dreifach) und x = −2.'},
+ {q:'<b>f(x) = x^3 − 4x^2 + 4x</b>',type:'roots',ans:[0,2],p:[1,-4,4,0],sol:'x(x^2 − 4x + 4) = 0. pq-Formel: x = 2 ± √(4 − 4) = 2. Der Ausdruck unter der Wurzel ist 0, also ist x = 2 eine doppelte Nullstelle. Dazu x = 0.'},
+ {q:'<b>f(x) = x^3 + 4x</b>',type:'roots',ans:[0],p:[1,0,4,0],sol:'x(x^2 + 4) = 0. Die Gleichung x^2 = −4 hat keine Lösung. Es bleibt nur x = 0.'},
+ {q:'Deckungsbeitrag des Helms „NordCap“: <b>D(x) = −x^3 + 4x^2 + 12x</b>. Berechnen Sie alle Nullstellen.',type:'roots',ans:[0,6,-2],p:[-1,4,12,0],sol:'−x(x^2 − 4x − 12) = 0. pq-Formel: x = 2 ± √(4 + 12) = 2 ± 4, also x = 6 oder x = −2. Dazu x = 0.'},
+ {q:'Bis zu welcher Menge deckt beim NordCap der Erlös die variablen Kosten?',type:'mc',o:['bis 2 ME','bis 6 ME','bis 12 ME'],a:1,sol:'Zwischen 0 und 6 ME ist D(x) positiv, zum Beispiel D(1) = 15. Darüber wird der Deckungsbeitrag negativ. Das passt zum Leitterm −x^3.'},
+ {q:'Lena löst 3x^3 − 12x = 0 so: 3x^3 = 12x, geteilt durch x ergibt 3x^2 = 12, also x^2 = 4 und x = 2. Welche Lösungen fehlen?',type:'mc',o:['keine, x = 2 ist die einzige Lösung','nur x = −2','x = 0 und x = −2'],a:2,sol:'Beim Teilen durch x geht x = 0 verloren. Aus x^2 = 4 folgen außerdem zwei Lösungen: 2 und −2. Richtig: 3x(x^2 − 4) = 0 mit x = 0, x = 2, x = −2.'}],
+b3b:[
+ {q:'<b>x^4 − 29x^2 + 100 = 0</b>',type:'roots',ans:[5,-5,2,-2],p:[1,0,-29,0,100],sol:'z^2 − 29z + 100 = 0. z = 14,5 ± √(210,25 − 100) = 14,5 ± 10,5, also z = 25 oder z = 4. Rücksubstitution: x = ±5 und x = ±2.'},
+ {q:'<b>x^4 − 3x^2 − 4 = 0</b>',type:'roots',ans:[2,-2],p:[1,0,-3,0,-4],sol:'z^2 − 3z − 4 = 0. z = 1,5 ± √(2,25 + 4) = 1,5 ± 2,5, also z = 4 oder z = −1. Aus x^2 = 4 folgt x = ±2. Aus x^2 = −1 folgt keine Lösung.'},
+ {q:'<b>x^4 + 5x^2 + 6 = 0</b>',type:'roots',ans:[],p:[1,0,5,0,6],sol:'z^2 + 5z + 6 = 0. z = −2,5 ± √(6,25 − 6) = −2,5 ± 0,5, also z = −2 oder z = −3. Beide sind negativ, es gibt keine Lösung.'},
+ {q:'<b>2x^4 − 36x^2 + 162 = 0</b>',type:'roots',ans:[3,-3],p:[2,0,-36,0,162],tip:'Teilen Sie zuerst durch 2.',sol:'x^4 − 18x^2 + 81 = 0, also z^2 − 18z + 81 = 0. z = 9 ± √(81 − 81) = 9. Rücksubstitution: x = ±3. Beide Nullstellen sind doppelt, der Graph berührt die x-Achse dort nur.'},
+ {q:'Welches Verfahren ist für <b>3x^4 − 12x^2 = 0</b> am schnellsten?',type:'mc',o:['Substitution','Ausklammern von 3x^2','Polynomdivision'],a:1,sol:'Das absolute Glied fehlt. 3x^2(x^2 − 4) = 0 liefert sofort x = 0 (doppelt), x = 2 und x = −2. Substitution geht auch, dauert aber länger.'},
+ {q:'Zusatz: <b>x^6 − 7x^3 − 8 = 0</b>',type:'roots',ans:[2,-1],p:[1,0,0,-7,0,0,-8],tip:'Wählen Sie z = x^3.',sol:'z^2 − 7z − 8 = 0. z = 3,5 ± √(12,25 + 8) = 3,5 ± 4,5, also z = 8 oder z = −1. Aus x^3 = 8 folgt x = 2, aus x^3 = −1 folgt x = −1. Bei ungeraden Potenzen gibt es jeweils nur eine Lösung, kein ±.'}],
+b3c:[
+ {q:'<b>f(x) = x^3 − 4x^2 + x + 6</b>',type:'roots',ans:[-1,2,3],p:[1,-4,1,6],tip:'Probieren Sie x = −1.',sol:'f(−1) = −1 − 4 − 1 + 6 = 0. Division durch (x + 1) ergibt x^2 − 5x + 6. pq-Formel: x = 2,5 ± 0,5, also x = 3 oder x = 2.'},
+ {q:'<b>f(x) = x^3 + 2x^2 − 5x − 6</b>',type:'roots',ans:[-1,2,-3],p:[1,2,-5,-6],sol:'f(−1) = −1 + 2 + 5 − 6 = 0. Division durch (x + 1) ergibt x^2 + x − 6. pq-Formel: x = −0,5 ± 2,5, also x = 2 oder x = −3.'},
+ {q:'<b>f(x) = 2x^3 − 2x^2 − 16x + 24</b>',type:'roots',ans:[2,-3],p:[2,-2,-16,24],sol:'f(2) = 16 − 8 − 32 + 24 = 0. Division durch (x − 2) ergibt 2x^2 + 2x − 12. Durch 2 teilen: x^2 + x − 6 = 0, also x = 2 oder x = −3. Die Nullstelle x = 2 tritt doppelt auf.'},
+ {q:'<b>f(x) = x^3 − 7x + 6</b> (Platzhalter beachten)',type:'roots',ans:[1,2,-3],p:[1,0,-7,6],sol:'f(1) = 1 − 7 + 6 = 0. Mit Platzhalter: (x^3 + 0x^2 − 7x + 6) : (x − 1) = x^2 + x − 6. pq-Formel: x = 2 oder x = −3.'},
+ {q:'Szenario „Lieferkosten steigen“: Für den TourNord gilt jetzt <b>G<sub>neu</sub>(x) = −x^3 + 10x^2 − 8x − 64</b>. Berechnen Sie alle Nullstellen.',type:'roots',ans:[4,8,-2],p:[-1,10,-8,-64],tip:'Die Wertetabelle zeigt eine Nullstelle bei x = 4.',sol:'G(4) = −64 + 160 − 32 − 64 = 0. Division durch (x − 4) ergibt −x^2 + 6x + 16. Mit −1 multiplizieren: x^2 − 6x − 16 = 0, also x = 3 ± 5: x = 8 oder x = −2.'},
+ {q:'Wie verändert sich die Gewinnzone des TourNord durch die höheren Lieferkosten?',type:'mc',o:['Sie bleibt bei 3 bis 9 ME.','Sie schrumpft von 3 bis 9 ME auf 4 bis 8 ME.','Sie wächst auf 2 bis 10 ME.'],a:1,sol:'Die Gewinnschwelle steigt von 300 auf 400 Räder, die Gewinngrenze sinkt von 900 auf 800 Räder. Der Spielraum wird kleiner, das Risiko steigt.'}],
+b4:[
+ {q:'<b>f(x) = x^4 − 2x^2 + 5</b>',type:'mc',o:SYM,a:0,sol:'Nur gerade Exponenten (4, 2, 0).'},
+ {q:'<b>f(x) = x^5 − 3x</b>',type:'mc',o:SYM,a:1,sol:'Nur ungerade Exponenten (5, 1).'},
+ {q:'<b>f(x) = 2x^4 − x</b>',type:'mc',o:SYM,a:2,sol:'Gerade (4) und ungerade (1) Exponenten kommen gemischt vor.'},
+ {q:'<b>f(x) = x^3 + 4x − 2</b>',type:'mc',o:SYM,a:2,sol:'Das absolute Glied −2 = −2 · x^0 hat einen geraden Exponenten. Daneben stehen ungerade Exponenten. Dieser Fehler ist häufig.'},
+ {q:'<b>f(x) = x(x − 1)(x + 1)</b>',type:'mc',o:SYM,a:1,sol:'Erst ausmultiplizieren: x(x^2 − 1) = x^3 − x. Nur ungerade Exponenten.'},
+ {q:'<b>f(x) = (x − 1)^2</b>',type:'mc',o:SYM,a:2,sol:'Ausmultipliziert: x^2 − 2x + 1. Die Exponenten 2, 1 und 0 sind gemischt.'},
+ {q:'Symmetrie nutzen: f ist achsensymmetrisch zur y-Achse mit f(2) = 5. g ist punktsymmetrisch zum Ursprung mit g(3) = −4.',type:'fields',f:[{l:'f(−2)',a:5},{l:'g(−3)',a:4},{l:'g(0)',a:0}],sol:'Achsensymmetrie: f(−2) = f(2) = 5. Punktsymmetrie: g(−3) = −g(3) = 4. Außerdem verläuft jeder punktsymmetrische Graph durch den Ursprung, also g(0) = 0.'},
+ {q:'Klausurübung Steckbrief: <b>f(x) = x^4 − 26x^2 + 25</b>',type:'fields',f:vf('+∞','+∞').concat([{l:'Symmetrie',a:SYM[0],o:SYM},{l:'f(0)',a:25}]),sol:'Leitterm x^4: gerade und positiv, beide Enden zeigen nach oben. Nur gerade Exponenten: achsensymmetrisch. Schnittpunkt mit der y-Achse: (0 | 25).'},
+ {q:'Berechnen Sie die Nullstellen von <b>f(x) = x^4 − 26x^2 + 25</b>.',type:'roots',ans:[5,-5,1,-1],p:[1,0,-26,0,25],sol:'z^2 − 26z + 25 = 0. z = 13 ± √(169 − 25) = 13 ± 12, also z = 25 oder z = 1. Rücksubstitution: x = ±5 und x = ±1. Wegen der Achsensymmetrie treten die Nullstellen paarweise auf.'}],
+b5:[
+ {q:'Bestimmen Sie Höchstpreis und Sättigungsmenge des ScootNord.',type:'fields',f:[{l:'Höchstpreis in GE/ME',a:30},{l:'Sättigungsmenge in ME',a:30}],sol:'p(0) = 30 GE/ME, das sind 3.000 € pro Scooter. Aus 30 − x = 0 folgt x = 30 ME.'},
+ {q:'Stellen Sie die Erlösfunktion auf: E(x) = ■x^2 + ■x',type:'fields',f:[{l:'vor x²',a:-1},{l:'vor x',a:30}],sol:'E(x) = p(x) · x = (30 − x) · x = −x^2 + 30x'},
+ {q:'Leiten Sie die Gewinnfunktion her: G(x) = ■x^3 + ■x^2 + ■x + ■',type:'fields',f:[{l:'vor x³',a:-1},{l:'vor x²',a:6},{l:'vor x',a:9},{l:'absolutes Glied',a:-14}],tip:'Setzen Sie K(x) in eine Klammer.',sol:'G(x) = −x^2 + 30x − (x^3 − 7x^2 + 21x + 14) = −x^2 + 30x − x^3 + 7x^2 − 21x − 14 = −x^3 + 6x^2 + 9x − 14'},
+ {q:'Berechnen Sie alle Nullstellen von G.',type:'roots',ans:[1,7,-2],p:[-1,6,9,-14],tip:'G(1) = ?',sol:'G(1) = −1 + 6 + 9 − 14 = 0. Division durch (x − 1) ergibt −x^2 + 5x + 14. Mit −1 multiplizieren: x^2 − 5x − 14 = 0, also x = 2,5 ± 4,5: x = 7 oder x = −2.'},
+ {q:'Geben Sie Gewinnschwelle und Gewinngrenze an und prüfen Sie E = K an der Gewinnschwelle.',type:'fields',f:[{l:'Gewinnschwelle in ME',a:1},{l:'Gewinngrenze in ME',a:7},{l:'E(1) = K(1) =',a:29}],sol:'Gewinnschwelle 1 ME (100 Scooter), Gewinngrenze 7 ME (700 Scooter). Probe: E(1) = −1 + 30 = 29 und K(1) = 1 − 7 + 21 + 14 = 29.'},
+ {q:'Bestimmen Sie das Gewinnmaximum näherungsweise mit einer Wertetabelle (Schrittweite 0,5) und den zugehörigen Preis.',type:'fields',f:[{l:'Menge in ME',a:4.5,t:0.26},{l:'Gewinn in GE',a:56.9,t:1},{l:'Preis in GE/ME',a:25.5,t:0.26}],sol:'G(4) = 54; G(4,5) ≈ 56,9; G(5) = 56. Das Maximum liegt bei ca. 4,5 ME (450 Scooter) mit ca. 57 GE, also rund 570.000 €. Preis: p(4,5) = 25,5 GE/ME, das sind 2.550 € pro Scooter.'},
+ {q:'Herr Brandt fragt: „Warum liegt die Gewinnschwelle dort, wo sich Erlös- und Kostenkurve schneiden?“',type:'mc',o:['Weil dort der Erlös am größten ist.','Weil dort E(x) = K(x) gilt, also G(x) = 0. Links davon sind die Kosten höher, rechts davon der Erlös.','Weil dort die Fixkosten null sind.'],a:1,sol:'Gewinn = Erlös − Kosten. Am Schnittpunkt ist der Gewinn null, danach liegt die Erlöskurve über der Kostenkurve.'},
+ {q:'Die Fixkosten steigen. Was passiert?',type:'mc',o:['Die Kostenkurve wird steiler, die Gewinnzone bleibt gleich.','Die Kostenkurve verschiebt sich nach oben, die Gewinnkurve nach unten, die Gewinnzone wird kleiner.','Die Erlöskurve verschiebt sich nach unten.'],a:1,sol:'Höhere Fixkosten verschieben K parallel nach oben und G parallel nach unten. Die Gewinnschwelle wandert nach rechts, die Gewinngrenze nach links. Probieren Sie es im Labor aus.'},
+ {q:'Zusatz: Das Marketing will den ScootNord günstiger anbieten, p(x) = b − x. Dann gilt G(x) = −x^3 + 6x^2 + (b − 21)x − 14. Bestimmen Sie b so, dass die Gewinnschwelle bei x = 2 liegt.',type:'fields',f:[{l:'b',a:20}],tip:'Setzen Sie G(2) = 0.',sol:'G(2) = −8 + 24 + 2(b − 21) − 14 = 2b − 40. Aus 2b − 40 = 0 folgt b = 20. Der Höchstpreis läge dann bei 2.000 € pro Scooter.'}],
+b5p:[
+ {q:'Berechnen Sie die Nullstellen von x(r) = −0,05r^3 + 0,6r^2 + 0,65r.',type:'roots',ans:[0,13,-1],p:[-0.05,0.6,0.65,0],sol:'−0,05r(r^2 − 12r − 13) = 0. pq-Formel: r = 6 ± √(36 + 13) = 6 ± 7, also r = 13 oder r = −1. Dazu r = 0.'},
+ {q:'Lesen Sie im Labor ab: Bei welchem Input liegt das Ertragsmaximum ungefähr, und was bedeutet es?',type:'mc',o:['bei ca. 4 FE, danach lohnt sich kein weiterer Einsatz','bei ca. 8,5 FE mit ca. 18 ME, mehr als rund 1.800 Rahmen sind nicht möglich','bei 13 FE, dort ist der Output am größten'],a:1,sol:'Die Wertetabelle zeigt x(8) = 18,0; x(8,5) ≈ 18,2; x(9) = 18,0. Mehr Arbeitsstunden senken den Output wieder. Bei 13 FE wäre er rechnerisch null, das Modell gilt nur bis zum Ertragsmaximum.'}]
+};
+
+/* ---------- Inhalte: Quiz ---------- */
+const QUIZ={
+b1:[
+ {q:'Wie lautet der Leitterm von f(x) = 4x^2 − x^5 + 3x?',o:['4x^2','−x^5','3x'],a:1,w:'Der Leitterm ist der Summand mit dem höchsten Exponenten, egal an welcher Stelle er steht.'},
+ {q:'Wie verläuft der Graph von f(x) = −2x^4 + x?',o:['von links oben nach rechts unten','von links unten nach rechts unten','von links unten nach rechts oben'],a:1,w:'Grad 4 ist gerade, beide Enden zeigen in dieselbe Richtung. Der Leitkoeffizient −2 ist negativ, also nach unten.'},
+ {q:'Ein Graph verläuft von links unten nach rechts oben. Welcher Term passt?',o:['f(x) = −x^3 + 4x','f(x) = 0,5x^3 − 4x','f(x) = 0,5x^4 − 4x'],a:1,w:'Entgegengesetzte Enden bedeuten ungeraden Grad. Rechts oben bedeutet positiven Leitkoeffizienten.'},
+ {q:'Für die Erlösfunktion E(x) = −2x^2 + 60x gilt für x → +∞ …',o:['E(x) → +∞, weil mehr Verkauf mehr Erlös bringt','E(x) → −∞, weil der Preis mit steigender Menge sinkt','E(x) → 60'],a:1,w:'Leitterm −2x^2. Ökonomisch: Laut Preis-Absatz-Funktion sinkt der Preis, ab der Sättigungsmenge wäre er negativ.'},
+ {q:'Wie lautet der Leitterm von f(x) = −(x − 4)(2x + 1)(x + 5)?',o:['−x^3','−2x^3','2x^3'],a:1,w:'Nur die höchsten Potenzen und den Vorfaktor multiplizieren: −1 · x · 2x · x = −2x^3.'}],
+b2:[
+ {q:'Welche Nullstellen hat f(x) = 2(x + 3)(x − 7)?',o:['3 und −7','−3 und 7','2, −3 und 7'],a:1,w:'(x + 3) = 0 bei x = −3 und (x − 7) = 0 bei x = 7. Der Vorfaktor 2 ist keine Nullstelle.'},
+ {q:'Was lässt sich an der Polynomform nicht direkt ablesen?',o:['der Grad','der y-Achsenabschnitt','die Nullstellen'],a:2,w:'Die Nullstellen zeigt nur die Linearfaktorform direkt. In der Polynomform müssen Sie sie berechnen.'},
+ {q:'f(x) = (x − 1)^2(x + 4). Was passiert bei x = 1?',o:['Der Graph schneidet die x-Achse.','Der Graph berührt die x-Achse.','Dort liegt der y-Achsenabschnitt.'],a:1,w:'x = 1 ist eine doppelte Nullstelle. Der Graph berührt die Achse und wechselt die Seite nicht.'},
+ {q:'Leitkoeffizient −1, einfache Nullstelle 0, doppelte Nullstelle 2. Welche Gleichung passt?',o:['f(x) = −x(x − 2)^2','f(x) = −x^2(x − 2)','f(x) = −(x − 2)^2'],a:0,w:'Der Faktor x steht für die einfache Nullstelle 0, (x − 2)^2 für die doppelte Nullstelle 2.'},
+ {q:'Was ergibt (x + 4)(x − 4)?',o:['x^2 − 8x − 16','x^2 − 16','x^2 + 16'],a:1,w:'Dritte binomische Formel: (a + b)(a − b) = a^2 − b^2.'}],
+b3a:[
+ {q:'Wann führt das Ausklammern von x zum Ziel?',o:['wenn der Grad ungerade ist','wenn das absolute Glied fehlt','wenn der Leitkoeffizient 1 ist'],a:1,w:'Fehlt das absolute Glied, steckt in jedem Summanden ein x.'},
+ {q:'Welche Lösungen hat x^3 − 25x = 0?',o:['nur 5','−5 und 5','−5, 0 und 5'],a:2,w:'x(x^2 − 25) = 0: x = 0 oder x^2 = 25.'},
+ {q:'Warum darf man die Gleichung nicht durch x teilen?',o:['Weil dabei die Lösung x = 0 verloren geht.','Weil sich dann das Vorzeichen umdreht.','Man darf es, es ist nur umständlich.'],a:0,w:'Durch x zu teilen setzt x ≠ 0 voraus. Genau diese Lösung fehlt danach.'},
+ {q:'Welche Nullstellen hat f(x) = x^5 − 2x^4?',o:['0 und 2','nur 2','0, 2 und −2'],a:0,w:'x^4(x − 2) = 0: x = 0 (vierfach) und x = 2.'},
+ {q:'Welche Lösungen hat x(x^2 + 9) = 0?',o:['0, 3 und −3','nur 0','keine'],a:1,w:'x^2 = −9 hat keine Lösung. Es bleibt x = 0.'}],
+b3b:[
+ {q:'Welche Gleichung ist biquadratisch?',o:['x^4 − 3x + 2 = 0','x^4 − 3x^2 + 2 = 0','x^3 − 3x^2 + 2 = 0'],a:1,w:'Biquadratisch heißt: nur x^4, x^2 und eine Zahl.'},
+ {q:'Die Substitution liefert z_1 = 9 und z_2 = −4. Welche Lösungen hat die Gleichung?',o:['9 und −4','3 und −3','3, −3, 2 und −2'],a:1,w:'Aus x^2 = 9 folgt x = ±3. Aus x^2 = −4 folgt keine Lösung.'},
+ {q:'Wie viele Lösungen kann eine biquadratische Gleichung höchstens haben?',o:['zwei','vier','acht'],a:1,w:'Höchstens zwei z-Werte, aus jedem höchstens zwei x-Werte.'},
+ {q:'Welcher Fehler passiert bei der Substitution am häufigsten?',o:['Die Rücksubstitution wird vergessen und z als Lösung angegeben.','Die pq-Formel wird zweimal angewendet.','Es wird durch x geteilt.'],a:0,w:'Gesucht ist x, nicht z. Denken Sie auch an das ± bei x = ±√z.'},
+ {q:'x^4 − 8x^2 + 16 = 0 führt auf z = 4 mit Wurzelausdruck 0. Was folgt?',o:['x = ±2, der Graph berührt dort die x-Achse','x = 4','keine Lösung'],a:0,w:'z = 4 ist eine doppelte Lösung. Daraus folgen die doppelten Nullstellen 2 und −2.'}],
+b3c:[
+ {q:'Welche Zahlen probieren Sie beim Raten zuerst?',o:['die Teiler des Leitkoeffizienten','die Teiler des absoluten Glieds','beliebige Dezimalzahlen'],a:1,w:'Ganzzahlige Nullstellen sind Teiler des absoluten Glieds.'},
+ {q:'x_1 = −2 ist eine Nullstelle. Durch welchen Term dividieren Sie?',o:['(x − 2)','(x + 2)','(−2x)'],a:1,w:'Man dividiert durch (x − x_1), also durch (x − (−2)) = (x + 2).'},
+ {q:'Bei der Division bleibt der Rest 5. Was bedeutet das?',o:['Die geratene Zahl ist keine Nullstelle, oder es gibt einen Rechenfehler.','Die Funktion hat fünf Nullstellen.','Das ist normal, der Rest wird ignoriert.'],a:0,w:'Bei einer echten Nullstelle geht die Division immer auf. Der Rest ist der Funktionswert an der geratenen Stelle.'},
+ {q:'Wie schreiben Sie x^3 − 5x + 2 vor der Division auf?',o:['x^3 − 5x + 2','x^3 + 0x^2 − 5x + 2','x^3 − 5x^2 + 2'],a:1,w:'Die fehlende Potenz x^2 bekommt den Platzhalter 0x^2. Sonst verrutschen die Spalten.'},
+ {q:'G hat die Nullstellen −2, 3 und 9. Was sind Gewinnschwelle und Gewinngrenze?',o:['−2 ME und 9 ME','3 ME und 9 ME','−2 ME und 3 ME'],a:1,w:'Negative Mengen sind ökonomisch nicht relevant. Die Gewinnzone liegt zwischen den beiden positiven Nullstellen.'}],
+b4:[
+ {q:'Welche Bedingung gilt bei Achsensymmetrie zur y-Achse?',o:['f(−x) = f(x)','f(−x) = −f(x)','f(x) = 0'],a:0,w:'Gegenüberliegende Stellen haben denselben Funktionswert.'},
+ {q:'Welche Symmetrie hat f(x) = x^3 − 4x + 1?',o:['punktsymmetrisch zum Ursprung','achsensymmetrisch zur y-Achse','keine von beiden'],a:2,w:'Das absolute Glied 1 gehört zum Exponenten 0, also zu den geraden Exponenten.'},
+ {q:'Was ergibt (−x)^3?',o:['x^3','−x^3','−3x'],a:1,w:'Bei ungeraden Exponenten bleibt das Minus erhalten, bei geraden verschwindet es.'},
+ {q:'Welche Symmetrie hat f(x) = x^2(x − 1)(x + 1)?',o:['achsensymmetrisch zur y-Achse','punktsymmetrisch zum Ursprung','keine von beiden'],a:0,w:'Ausmultipliziert: x^2(x^2 − 1) = x^4 − x^2. Nur gerade Exponenten.'},
+ {q:'Durch welchen Punkt verläuft jeder zum Ursprung punktsymmetrische Graph einer ganzrationalen Funktion?',o:['(0 | 1)','(0 | 0)','(1 | 1)'],a:1,w:'Es gibt kein absolutes Glied, also f(0) = 0.'}],
+b5:[
+ {q:'p(x) = 40 − 4x. Wie lautet die Erlösfunktion?',o:['E(x) = 40 − 4x^2','E(x) = −4x^2 + 40x','E(x) = 40x − 4'],a:1,w:'E(x) = p(x) · x = (40 − 4x) · x.'},
+ {q:'Welcher Fehler passiert bei G(x) = E(x) − K(x) am häufigsten?',o:['Die Klammer um K(x) fehlt, nur der erste Summand wird abgezogen.','E und K werden vertauscht.','Die Fixkosten werden doppelt gezählt.'],a:0,w:'Das Minus gilt für alle Summanden von K. Jedes Vorzeichen in der Klammer dreht sich um.'},
+ {q:'Was ist die Gewinnschwelle?',o:['die Menge mit dem größten Gewinn','die kleinere positive Nullstelle von G','der Schnittpunkt von G mit der y-Achse'],a:1,w:'Ab der Gewinnschwelle decken die Erlöse alle Kosten.'},
+ {q:'p(x) = 45 − 3x. Wie groß ist die Sättigungsmenge?',o:['45 ME','15 ME','3 ME'],a:1,w:'45 − 3x = 0 ergibt x = 15.'},
+ {q:'K(x) = x^3 − 9x^2 + 30x + 25. Wie hoch sind die Fixkosten?',o:['30 GE','25 GE','9 GE'],a:1,w:'K(0) = 25. Das absolute Glied sind die Fixkosten.'}],
+check:[
+ {q:'Welches Verfahren passt zu x^3 − 6x^2 + 5x = 0?',o:['Ausklammern','Substitution','Polynomdivision'],a:0,w:'Das absolute Glied fehlt.'},
+ {q:'Welches Verfahren passt zu x^4 − 6x^2 + 5 = 0?',o:['Ausklammern','Substitution','Polynomdivision'],a:1,w:'Nur x^4, x^2 und eine Zahl: biquadratisch.'},
+ {q:'Welches Verfahren passt zu x^3 − 6x^2 + 5x + 12 = 0?',o:['Ausklammern','Substitution','Nullstelle raten und Polynomdivision'],a:2,w:'Absolutes Glied vorhanden, ungerade Exponenten.'},
+ {q:'Welche Nullstellen hat f(x) = x^3 − 6x^2 + 5x + 12?',o:['−1, 3 und 4','1, −3 und −4','−1, 2 und 6'],a:0,w:'f(−1) = −1 − 6 − 5 + 12 = 0. Division durch (x + 1) ergibt x^2 − 7x + 12 mit den Lösungen 3 und 4.'},
+ {q:'Wie verläuft der Graph von f(x) = −0,5x^4 + 3x^3?',o:['von links unten nach rechts unten','von links oben nach rechts unten','von links oben nach rechts oben'],a:0,w:'Grad gerade, Leitkoeffizient negativ.'},
+ {q:'Welche Symmetrie hat f(x) = x^5 − x^3 + 2?',o:['punktsymmetrisch zum Ursprung','achsensymmetrisch zur y-Achse','keine von beiden'],a:2,w:'Das absolute Glied 2 zählt als gerader Exponent.'},
+ {q:'Was ist die Polynomform von f(x) = −2(x − 1)(x + 3)?',o:['−2x^2 − 4x + 6','−2x^2 + 4x − 6','−2x^2 − 4x − 6'],a:0,w:'(x − 1)(x + 3) = x^2 + 2x − 3. Mal −2: −2x^2 − 4x + 6.'},
+ {q:'p(x) = 24 − 2x und K(x) = x^3 − 6x^2 + 15x + 8. Wie lautet G(x)?',o:['−x^3 + 4x^2 + 9x − 8','−x^3 − 8x^2 + 39x + 8','−x^3 + 4x^2 + 9x + 8'],a:0,w:'E(x) = −2x^2 + 24x. G(x) = −2x^2 + 24x − x^3 + 6x^2 − 15x − 8.'},
+ {q:'G hat die Nullstellen −2, 1 und 7 und den Leitterm −x^3. Wo liegt die Gewinnzone?',o:['zwischen −2 und 1 ME','zwischen 1 und 7 ME','ab 7 ME'],a:1,w:'Zwischen den positiven Nullstellen ist G positiv. Ab 7 ME wird G wegen des Leitterms negativ.'},
+ {q:'Der Gleichungslöser des Taschenrechners zeigt x_1 = 7, x_2 = −2, x_3 = 1. Was gehört in der Klausur aufs Papier?',o:['nur die drei Lösungen','der vollständige Rechenweg mit Probe, Division und pq-Formel','ein Hinweis auf das verwendete Menü'],a:1,w:'Der Löser dient zur Kontrolle. Bewertet wird der Rechenweg.'},
+ {q:'Die Wertetabelle zeigt G(6) = 72, G(6,5) ≈ 74,4 und G(7) = 72. Was notieren Sie?',o:['Das Gewinnmaximum liegt bei ca. 6,5 ME mit ca. 74 GE.','Das Gewinnmaximum liegt exakt bei 6,5 ME.','Es gibt zwei Gewinnmaxima.'],a:0,w:'Ohne Differenzialrechnung ist der Wert eine Näherung. Schreiben Sie „ca.“ und nennen Sie die Nachbarwerte.'},
+ {q:'1 ME = 100 Räder, 1 GE = 10.000 €. Was bedeutet ein Preis von 47 GE/ME?',o:['47 € pro Rad','4.700 € pro Rad','470.000 € pro Rad'],a:1,w:'1 GE/ME = 10.000 € : 100 Räder = 100 € pro Rad.'}]
+};
+
+/* ---------- Polynomdivision als Text ---------- */
+function divText(c,r,upto){
+ const n=c.length-1,rem=c.slice(),q=[],L=[];let ind=0,rest=null;
+ const term=(a,d,first)=>{const ab=Math.abs(a);const t=((ab===1&&d>0)?'':N(ab))+(d>0?'x'+(d>1?SUP[d]:''):'');return first?(a<0?'−':'')+t:(a<0?' − ':' + ')+t};
+ for(let i=0;i<n&&i<upto;i++){const a=rem[i],d=n-i;q.push(a);const b=-a*r;
+  L.push(' '.repeat(ind)+'−('+term(a,d,true)+term(b,d-1,false)+')');
+  L.push(' '.repeat(ind)+'─'.repeat(16));
+  rem[i+1]=+(rem[i+1]+a*r).toFixed(9);ind+=4;
+  if(i<n-1)L.push(' '.repeat(ind)+term(rem[i+1],d-1,true)+term(rem[i+2],d-2,false));
+  else{rest=rem[n];L.push(' '.repeat(ind)+'Rest '+Z(rest))}}
+ const qc=q.concat(new Array(n-q.length).fill(0));
+ const head=' ('+PT(c,true)+') : (x '+(r<0?'+ '+N(r):'− '+N(r))+') = '+(q.length?PT(qc).replace(/^0$/,''):'')+(q.length<n?' …':'');
+ return head+'\n'+L.join('\n');
+}
+
+/* ---------- Bausteine der Oberfläche ---------- */
+let uid=0;
+function renderSteps(el,arr){
+ el.innerHTML=arr.map((s,i)=>'<div class="step"'+(i?' hidden':'')+'><b class="n">Schritt '+(i+1)+'</b><br>'+M(s)+'</div>').join('')+'<div class="row"><button class="btn small" type="button">Nächsten Schritt zeigen</button><button class="btn ghost small" type="button">Alle zeigen</button></div>';
+ const st=$$('.step',el),[nx,all]=$$('button',el);let k=1;
+ const upd=()=>{st.forEach((s,i)=>s.hidden=i>=k);if(k>=st.length){nx.hidden=true;all.hidden=true}};
+ nx.onclick=()=>{k++;upd()};all.onclick=()=>{k=st.length;upd()};
+}
+function renderTasks(el,list,grp){
+ el.innerHTML='';
+ list.forEach((t,i)=>{
+  const d=document.createElement('div');d.className='task';const id='t'+(++uid);
+  let h='<div class="tn">Aufgabe '+(i+1)+'</div><div>'+M(t.q)+'</div>';
+  if(t.type==='roots')h+='<div class="fields"><label for="'+id+'">Nullstellen (mit Semikolon trennen, oder „keine“)<input type="text" id="'+id+'" autocomplete="off" placeholder="z. B. −2; 0; 3"></label></div>';
+  if(t.type==='fields')h+='<div class="fields">'+t.f.map((f,j)=>'<label for="'+id+'_'+j+'">'+f.l+(f.o?'<select id="'+id+'_'+j+'"><option value="">bitte wählen</option>'+f.o.map(o=>'<option>'+o+'</option>').join('')+'</select>':'<input type="text" id="'+id+'_'+j+'" autocomplete="off">')+'</label>').join('')+'</div>';
+  if(t.type==='mc')h+='<div class="opts">'+t.o.map((o,j)=>'<button class="opt" type="button" data-j="'+j+'">'+M(o)+'</button>').join('')+'</div>';
+  if(t.type!=='mc')h+='<button class="btn small" type="button" data-check>Prüfen</button>';
+  h+='<div class="fb" aria-live="polite"></div>';
+  if(t.tip)h+='<details><summary>Tipp</summary><div class="sol">'+M(t.tip)+'</div></details>';
+  h+='<details><summary>Lösungsweg anzeigen</summary><div class="sol">'+M(t.sol)+'</div></details>';
+  d.innerHTML=h;el.appendChild(d);
+  const fb=$('.fb',d),say=(ok,msg)=>{fb.className='fb '+(ok?'ok':'no');fb.textContent=(ok?'✓ ':'✗ ')+msg};
+  if(t.type==='mc')$$('.opt',d).forEach(b=>b.onclick=()=>{$$('.opt',d).forEach(x=>x.classList.remove('right','wrong'));const ok=+b.dataset.j===t.a;b.classList.add(ok?'right':'wrong');say(ok,ok?'Richtig.':'Noch nicht. Überlegen Sie noch einmal oder öffnen Sie den Lösungsweg.')});
+  else $('[data-check]',d).onclick=()=>{
+   if(t.type==='roots'){
+    const raw=$('#'+id,d).value.trim().toLowerCase();if(!raw){say(false,'Bitte geben Sie etwas ein.');return}
+    let arr=/^kein/.test(raw)?[]:raw.split(/[;\s]+/).filter(Boolean).map(num);
+    if(arr.some(isNaN)){say(false,'Bitte nur Zahlen eingeben und mit Semikolon trennen.');return}
+    arr=arr.filter((v,k)=>arr.findIndex(w=>near(v,w))===k);
+    const hit=arr.filter(v=>t.ans.some(a=>near(a,v))).length;
+    if(hit===t.ans.length&&arr.length===t.ans.length)say(true,t.ans.length?'Richtig, alle Nullstellen gefunden.':'Richtig, es gibt keine Nullstelle.');
+    else if(arr.length>hit)say(false,hit+' von '+arr.length+' Ihrer Werte stimmen. Prüfen Sie die anderen mit einer Probe.');
+    else say(false,hit?'Diese Werte stimmen, aber es fehlen noch Nullstellen.':'Das stimmt noch nicht.');
+   }else{
+    let ok=0,empty=0;t.f.forEach((f,j)=>{const inp=$('#'+id+'_'+j,d);let good;
+     if(f.o){if(!inp.value)empty++;good=inp.value===f.a}else{const v=num(inp.value);if(isNaN(v))empty++;good=near(v,f.a,f.t)}
+     inp.classList.toggle('okf',good);inp.classList.toggle('nof',!good);if(good)ok++});
+    if(ok===t.f.length)say(true,'Alles richtig.');else say(false,ok+' von '+t.f.length+' Feldern stimmen.'+(empty?' Einige Felder sind noch leer.':''));
+   }};
+  const key=grp+':'+i,sv=S.ans[key];
+  if(t.type==='mc'){const os=$$('.opt',d);if(typeof sv==='number'&&os[sv])os[sv].onclick();os.forEach(b=>b.addEventListener('click',()=>{S.ans[key]=+b.dataset.j;save()}))}
+  else{const ins=$$('.fields input,.fields select',d);
+   if(Array.isArray(sv)){ins.forEach((x,j)=>{if(sv[j]!=null)x.value=sv[j]});if(ins.some(x=>x.value))$('[data-check]',d).onclick()}
+   const store=()=>{const v=ins.map(x=>x.value);if(v.some(x=>x))S.ans[key]=v;else delete S.ans[key];save()};
+   ins.forEach(x=>{x.addEventListener('input',store);x.addEventListener('change',store)})}
+ });
+}
+function renderAll(){$$('[data-tasks]').forEach(e=>renderTasks(e,TASKS[e.dataset.tasks],e.dataset.tasks));$$('[data-quiz]').forEach(e=>renderQuiz(e,e.dataset.quiz))}
+function renderQuiz(el,id){
+ const qs=QUIZ[id];let done=0,right=0;
+ el.innerHTML=qs.map((q,i)=>'<div class="qq"><div><b>'+(i+1)+'.</b> '+M(q.q)+'</div><div class="opts">'+q.o.map((o,j)=>'<button class="opt" type="button" data-i="'+i+'" data-j="'+j+'">'+M(o)+'</button>').join('')+'</div><div class="why" hidden></div></div>').join('')+'<div class="score" hidden aria-live="polite"></div><p><button class="btn ghost small" type="button" data-again hidden>Quiz noch einmal starten</button></p>';
+ $$('.opt',el).forEach(b=>b.onclick=()=>{
+  const i=+b.dataset.i,q=qs[i],box=b.closest('.qq'),ok=+b.dataset.j===q.a;
+  $$('.opt',box).forEach((x,j)=>{x.disabled=true;if(j===q.a)x.classList.add('right')});
+  if(!ok)b.classList.add('wrong');else right++;done++;
+  const w=$('.why',box);w.hidden=false;w.innerHTML='<b>'+(ok?'✓ Richtig. ':'✗ Leider nicht. ')+'</b>'+M(q.w);
+  if(done===qs.length){
+   const sc=$('.score',el);sc.hidden=false;const pct=right/qs.length;
+   sc.textContent=right+' von '+qs.length+' richtig. '+(pct===1?'Stark, das sitzt.':pct>=0.6?'Gut. Schauen Sie sich die markierten Fragen noch einmal an.':'Arbeiten Sie die Infobox und das Beispiel noch einmal durch und starten Sie dann neu.');
+   $('[data-again]',el).hidden=false;
+   const old=S.quiz[id];if(!old||right>old.r)S.quiz[id]={r:right,n:qs.length};save();refresh();
+  }});
+ $('[data-again]',el).onclick=()=>renderQuiz(el,id);
+}
+
+/* ---------- Zeichnen ---------- */
+function nice(v){const p=Math.pow(10,Math.floor(Math.log10(v))),f=v/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p}
+function tick(v){return Math.abs(v)>=1e5?(v<0?'−':'')+Math.abs(v).toLocaleString('de-DE',{notation:'compact',maximumFractionDigits:1}):Z(v)}
+function plot(cv,o){
+ const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h||!cv.getContext)return;const c=cv.getContext('2d');if(!c)return;
+ const dp=window.devicePixelRatio||1;cv.width=w*dp;cv.height=h*dp;c.setTransform(dp,0,0,dp,0,0);c.clearRect(0,0,w,h);
+ const L=50,R=12,T=12,B=34,pw=w-L-R,ph=h-T-B;
+ const X=x=>L+(x-o.x0)/(o.x1-o.x0)*pw,Y=y=>T+ph-(y-o.y0)/(o.y1-o.y0)*ph;
+ c.fillStyle='#fff';c.fillRect(L,T,pw,ph);c.font='12px system-ui,sans-serif';
+ (o.bands||[]).forEach(b=>{c.fillStyle=b.color;c.fillRect(X(b.a),T,X(b.b)-X(b.a),ph)});
+ const sx=nice((o.x1-o.x0)/8),sy=nice((o.y1-o.y0)/6);c.lineWidth=1;
+ c.textAlign='center';c.textBaseline='top';
+ for(let k=Math.ceil(o.x0/sx);k*sx<=o.x1+1e-9;k++){const x=k*sx;c.strokeStyle='#ece9f8';c.beginPath();c.moveTo(X(x),T);c.lineTo(X(x),T+ph);c.stroke();c.fillStyle='#5c5978';c.fillText(tick(+x.toPrecision(10)),X(x),T+ph+5)}
+ c.textAlign='right';c.textBaseline='middle';
+ for(let k=Math.ceil(o.y0/sy);k*sy<=o.y1+1e-9;k++){const y=k*sy;c.strokeStyle='#ece9f8';c.beginPath();c.moveTo(L,Y(y));c.lineTo(L+pw,Y(y));c.stroke();c.fillStyle='#5c5978';c.fillText(tick(+y.toPrecision(10)),L-6,Y(y))}
+ c.strokeStyle='#1f1d3a';c.lineWidth=1.4;
+ if(o.y0<=0&&o.y1>=0){c.beginPath();c.moveTo(L,Y(0));c.lineTo(L+pw,Y(0));c.stroke()}
+ if(o.x0<=0&&o.x1>=0){c.beginPath();c.moveTo(X(0),T);c.lineTo(X(0),T+ph);c.stroke()}
+ c.fillStyle='#1f1d3a';c.textAlign='right';c.textBaseline='bottom';c.fillText(o.xl||'x',L+pw-2,T+ph+31);
+ c.textAlign='left';c.textBaseline='top';c.fillText(o.yl||'y',4,0);
+ c.save();c.beginPath();c.rect(L,T,pw,ph);c.clip();
+ (o.vlines||[]).forEach(v=>{c.strokeStyle=v.color;c.lineWidth=1.5;c.setLineDash([4,4]);c.beginPath();c.moveTo(X(v.x),T);c.lineTo(X(v.x),T+ph);c.stroke();c.setLineDash([])});
+ (o.fns||[]).forEach(f=>{c.strokeStyle=f.color;c.lineWidth=f.w||2.5;c.setLineDash(f.dash||[]);c.beginPath();let pen=false;
+  for(let px=0;px<=pw;px+=1.5){const x=o.x0+px/pw*(o.x1-o.x0);let y=Y(f.f(x));if(!isFinite(y)){pen=false;continue}y=Math.max(-5000,Math.min(5000,y));if(pen)c.lineTo(L+px,y);else{c.moveTo(L+px,y);pen=true}}
+  c.stroke();c.setLineDash([])});
+ (o.points||[]).forEach(p=>{c.fillStyle=p.color;c.beginPath();c.arc(X(p.x),Y(p.y),5,0,6.3);c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke()});
+ c.restore();
+}
+
+/* ---------- Labore ---------- */
+const val=id=>+$('#'+id).value, setO=(id,t)=>{$('#'+id+'O').innerHTML=t};
+const ZOOM=[2,3,5,10,20,50,100];
+function lab1(){
+ const n=val('l1n');let a=val('l1a');const X=ZOOM[val('l1z')],ex=$('#l1e').checked;
+ setO('l1n',n);setO('l1a',Z(a));setO('l1z','±'+X);
+ const out=$('#l1out');
+ if(a===0){out.innerHTML='Der Leitkoeffizient darf nicht 0 sein. Sonst wäre der Grad kleiner als n.';plot($('#c1'),{x0:-X,x1:X,y0:-10,y1:10,fns:[]});return}
+ const c=new Array(n+1).fill(0);c[0]=a;if(ex){[2,-6,3].forEach((v,i)=>{if(i+1<=n)c[i+1]=v})}
+ const lead=new Array(n+1).fill(0);lead[0]=a;
+ const ym=Math.max(Math.abs(a)*Math.pow(X,n)*1.1,4);
+ plot($('#c1'),{x0:-X,x1:X,y0:-ym,y1:ym,fns:[{f:x=>ev(lead,x),color:'#f0456a',dash:[6,5],w:2},{f:x=>ev(c,x),color:'#6d3bf5',w:3}]});
+ const even=n%2===0,r=a>0?'+∞':'−∞',l=even?r:(a>0?'−∞':'+∞');
+ out.innerHTML='<b>f(x) = '+P(c)+'</b><br>Leitterm: '+P(lead)+'<br>Grad '+n+' ist '+(even?'gerade':'ungerade')+', a<sub>n</sub> ist '+(a>0?'positiv':'negativ')+'.<br><b>Verlauf:</b> von links '+(l==='+∞'?'oben':'unten')+' nach rechts '+(r==='+∞'?'oben':'unten')+'<br>Für x → −∞ gilt f(x) → '+l+'.<br>Für x → +∞ gilt f(x) → '+r+'.';
+}
+function lab2(){
+ const a=val('l2a'),rs=[val('l2r1'),val('l2r2'),val('l2r3')];
+ setO('l2a',Z(a));rs.forEach((r,i)=>setO('l2r'+(i+1),Z(r)));
+ const out=$('#l2out');
+ if(a===0){out.innerHTML='Der Leitkoeffizient darf nicht 0 sein.';plot($('#c2'),{x0:-6,x1:6,y0:-10,y1:10,fns:[]});return}
+ let c=[a];rs.forEach(r=>c=mul(c,[1,-r]));
+ const cnt={};rs.forEach(r=>cnt[r]=(cnt[r]||0)+1);const ks=Object.keys(cnt).map(Number).sort((x,y)=>x-y);
+ const fac=ks.map(r=>(r===0?'x':'(x '+(r>0?'− '+N(r):'+ '+N(r))+')')+(cnt[r]>1?'<sup>'+cnt[r]+'</sup>':'')).join('');
+ const pre=a===1?'':a===-1?'−':Z(a)+' · ';
+ const lo=Math.min.apply(0,rs)-0.8,hi=Math.max.apply(0,rs)+0.8;let ym=4;for(let x=lo;x<=hi;x+=0.05)ym=Math.max(ym,Math.abs(ev(c,x)));ym*=1.25;
+ plot($('#c2'),{x0:-6.5,x1:6.5,y0:-ym,y1:ym,fns:[{f:x=>ev(c,x),color:'#6d3bf5',w:3}],points:ks.map(r=>({x:r,y:0,color:cnt[r]>1?'#f0456a':'#0aa6a0'})).concat([{x:0,y:c[3],color:'#b97400'}])});
+ out.innerHTML='<b>Linearfaktorform</b><br>f(x) = '+pre+fac+'<br><b>Polynomform</b><br>f(x) = '+P(c)+'<br><b>Nullstellen:</b> '+ks.map(r=>'x = '+Z(r)+' ('+['','einfach, Graph schneidet','doppelt, Graph berührt','dreifach, Graph schneidet flach'][cnt[r]]+')').join('; ')+'<br><b>y-Achsenabschnitt:</b> (0 | '+Z(c[3])+')';
+}
+function lab3(){
+ const b=val('l3b'),cc=val('l3c');setO('l3b',Z(b));setO('l3c',Z(cc));
+ const c=[1,0,b,0,cc],D=b*b/4-cc;let h='<b>f(x) = '+P(c)+'</b><br>Substitution: '+P([1,b,cc],'z')+' = 0<br>Unter der Wurzel: ('+Z(b/2)+')<sup>2</sup> − ('+Z(cc)+') = '+Z(D)+'<br>';
+ const xs=[];
+ if(D<0)h+='Negativ, also gibt es kein z und <b>keine Nullstelle</b>.';
+ else{const zs=D===0?[-b/2]:[-b/2+Math.sqrt(D),-b/2-Math.sqrt(D)];
+  h+=zs.map((z,i)=>'z<sub>'+(i+1)+'</sub> = '+Z(z,2)+': '+(z>0?'x = ±'+N(Math.sqrt(z),2):z===0?'x = 0':'keine Lösung')).join('<br>');
+  zs.forEach(z=>{if(z>0){xs.push(Math.sqrt(z),-Math.sqrt(z))}else if(z===0)xs.push(0)});
+  h+='<br><b>'+(xs.length?xs.length+' Nullstelle'+(xs.length>1?'n':'')+(D===0&&xs.length?' (doppelt, der Graph berührt)':''):'Keine Nullstelle')+'</b>';}
+ $('#l3out').innerHTML=h;
+ plot($('#c3'),{x0:-5,x1:5,y0:-60,y1:60,fns:[{f:x=>ev(c,x),color:'#6d3bf5',w:3}],points:xs.map(x=>({x:x,y:0,color:'#0aa6a0'}))});
+}
+function lab4(){
+ const c=['l4a4','l4a3','l4a2','l4a1','l4a0'].map(val);['l4a4','l4a3','l4a2','l4a1','l4a0'].forEach((id,i)=>setO(id,Z(c[i])));
+ const ex=[];c.forEach((a,i)=>{if(a)ex.push(4-i)});const ev_=ex.filter(e=>e%2===0),od=ex.filter(e=>e%2===1);
+ let v;if(!ex.length)v='Alle Koeffizienten sind 0. Stellen Sie mindestens einen Regler ein.';
+ else if(!od.length)v='Nur gerade Exponenten ('+ev_.join(', ')+'): <b>achsensymmetrisch zur y-Achse</b>. Es gilt f(−x) = f(x).';
+ else if(!ev_.length)v='Nur ungerade Exponenten ('+od.join(', ')+'): <b>punktsymmetrisch zum Ursprung</b>. Es gilt f(−x) = −f(x).';
+ else v='Gerade ('+ev_.join(', ')+') und ungerade ('+od.join(', ')+') Exponenten gemischt: <b>keine der beiden Symmetrien</b>.';
+ const m=c.map((a,i)=>(4-i)%2?-a:a);
+ $('#l4out').innerHTML='<b>f(x) = '+P(c)+'</b><br>f(−x) = '+P(m)+'<br>'+v;
+ const fns=[];if($('#l4m').checked)fns.push({f:x=>ev(c,-x),color:'#0aa6a0',dash:[7,5],w:2.5});if($('#l4d').checked)fns.push({f:x=>-ev(c,-x),color:'#f0456a',dash:[2,4],w:2.5});
+ fns.push({f:x=>ev(c,x),color:'#6d3bf5',w:3});
+ plot($('#c4'),{x0:-4,x1:4,y0:-8,y1:8,fns:fns});
+}
+function lab5(){
+ const b=val('l5b'),m=val('l5m'),kf=val('l5f'),x=val('l5x');
+ setO('l5b',N(b)+' GE/ME');setO('l5m',N(m)+' GE');setO('l5f',N(kf)+' GE');setO('l5x',N(x,1)+' ME');
+ const E=[-m,b,0],K=[1,-12,63,kf],G=[-1,12-m,b-63,-kf],g=t=>ev(G,t);
+ const rs=realRoots(g,0.001,14,0.01).map(r=>+r.toFixed(2));
+ let best=0,bx=0;for(let t=0;t<=14.001;t+=0.1){const y=g(t);if(y>best){best=y;bx=t}}
+ const bands=[];let zone;
+ if(rs.length>=2){bands.push({a:rs[0],b:rs[1],color:'#d9f5ea'});zone='<b>Gewinnzone:</b> von '+N(rs[0],2)+' bis '+N(rs[1],2)+' ME<br><b>Gewinnmaximum:</b> ca. '+N(bx,1)+' ME mit ca. '+N(best,1)+' GE, Preis '+N(b-m*bx,1)+' GE/ME'}
+ else if(rs.length===1&&best>0){bands.push({a:rs[0],b:14,color:'#d9f5ea'});zone='<b>Gewinnzone:</b> ab '+N(rs[0],2)+' ME (Gewinngrenze außerhalb des Ausschnitts)'}
+ else zone='<b>Keine Gewinnzone:</b> Die Kosten liegen überall über dem Erlös.';
+ const fns=[{f:t=>ev(E,t),color:'#0b8a5f',w:2.5},{f:t=>ev(K,t),color:'#f0456a',dash:[7,5],w:2.5},{f:g,color:'#6d3bf5',w:4}];
+ if($('#l5p').checked)fns.push({f:t=>b-m*t,color:'#b97400',dash:[2,4],w:2.5});
+ plot($('#c5'),{x0:0,x1:14,y0:-200,y1:600,xl:'x in ME',yl:'GE',bands:bands,fns:fns,vlines:[{x:x,color:'#1f1d3a'}],points:[{x:x,y:ev(E,x),color:'#0b8a5f'},{x:x,y:ev(K,x),color:'#f0456a'},{x:x,y:g(x),color:'#6d3bf5'}]});
+ const gx=g(x);
+ $('#l5out').innerHTML='p(x) = '+P([-m,b])+'<br>E(x) = '+P(E)+'<br>K(x) = '+P(K)+'<br><b>G(x) = '+P(G)+'</b><br>'+zone+'<hr style="border:0;border-top:1px solid #bfe5e2;margin:8px 0"><b>Bei x = '+N(x,1)+' ME</b> ('+N(x*100,0)+' Räder):<br>Preis '+N(b-m*x,1)+' GE/ME = '+N((b-m*x)*100,0)+' € pro Rad<br>E = '+Z(ev(E,x),1)+' GE, K = '+Z(ev(K,x),1)+' GE<br>G = '+Z(gx,1)+' GE = '+Z(gx*10000,0)+' € ('+(gx>0?'Gewinn':gx<0?'Verlust':'weder Gewinn noch Verlust')+')';
+}
+function lab6(){
+ const r=val('l6r'),c=[-0.05,0.6,0.65,0],y=ev(c,r);setO('l6r',N(r,1)+' FE');
+ plot($('#c6'),{x0:0,x1:14,y0:-4,y1:22,xl:'r in FE',yl:'ME',fns:[{f:t=>ev(c,t),color:'#6d3bf5',w:3}],vlines:[{x:r,color:'#1f1d3a'}],points:[{x:r,y:y,color:'#6d3bf5'}]});
+ $('#l6out').innerHTML='<b>Input:</b> '+N(r*1000,0)+' Arbeitsstunden<br><b>Output:</b> x('+N(r,1)+') = '+Z(y,2)+' ME ≈ '+N(Math.max(y,0)*100,0)+' Rahmen'+(r>0?'<br><b>Durchschnittsertrag:</b> '+Z(y/r,2)+' ME je FE':'')+(r>8.5?'<br>Hier sinkt der Output schon wieder. Der Bereich ist ökonomisch nicht sinnvoll.':'');
+}
+const LABS={b1:[lab1],b2:[lab2],b3b:[lab3],b4:[lab4],b5:[lab5,lab6]};
+
+/* Polynomdivision-Labor */
+const DV=[['G(x) = −x³ + 10x² − 3x − 54 (TourNord)',[-1,10,-3,-54]],['f(x) = x³ − 4x² + x + 6',[1,-4,1,6]],['f(x) = x³ + 2x² − 5x − 6',[1,2,-5,-6]],['f(x) = 2x³ − 2x² − 16x + 24',[2,-2,-16,24]],['f(x) = x³ − 7x + 6',[1,0,-7,6]],['G(x) = −x³ + 10x² − 8x − 64 (Szenario)',[-1,10,-8,-64]],['G(x) = −x³ + 6x² + 9x − 14 (ScootNord)',[-1,6,9,-14]]];
+function dvInit(){
+ const sel=$('#dvP'),out=$('#dvOut');sel.innerHTML=DV.map((d,i)=>'<option value="'+i+'">'+d[0]+'</option>').join('');
+ const go=()=>{const c=DV[+sel.value][1],r=num($('#dvR').value);
+  if(isNaN(r)||Math.abs(r)>50){out.innerHTML='<div class="fb no">✗ Bitte eine Zahl eingeben, zum Beispiel 3 oder −1.</div>';return}
+  const y=+ev(c,r).toFixed(6);
+  if(y!==0){const d=Math.abs(c[c.length-1]),ts=[];for(let k=1;k<=d;k++)if(d%k===0)ts.push('±'+k);
+   out.innerHTML='<div class="fb no">✗ f('+Z(r)+') = '+Z(y)+'. Das ist nicht 0, also keine Nullstelle.</div><p>Probieren Sie die Teiler des absoluten Glieds: '+ts.join(', ')+'.</p>';return}
+  let k=1;const n=c.length-1;
+  const draw=()=>{let h='<div class="fb ok">✓ f('+Z(r)+') = 0. Die Division geht auf.</div><pre class="div">'+divText(c,r,k)+'</pre>';
+   if(k<n)h+='<div class="row"><button class="btn small" type="button" id="dvN">Nächste Zeile</button><button class="btn ghost small" type="button" id="dvA">Alles zeigen</button></div>';
+   else{const q=[];let t=0;for(let i=0;i<n;i++){t=t*r+c[i];q.push(+t.toFixed(9))}
+    const p=q[1]/q[0],qq=q[2]/q[0],D=p*p/4-qq;
+    h+='<div class="out">Restpolynom: '+P(q)+' = 0'+(q[0]!==1?'<br>Durch '+Z(q[0])+' teilen: '+P([1,p,qq])+' = 0':'')+'<br>pq-Formel: x = '+Z(-p/2)+' ± √('+Z(D)+')'+(D<0?'<br>Keine weitere Nullstelle.':'<br>x = '+Z(-p/2+Math.sqrt(D),2)+(D>0?' und x = '+Z(-p/2-Math.sqrt(D),2):' (doppelt)'))+'<br><b>Geraten:</b> x = '+Z(r)+'</div>'}
+   out.innerHTML=h;const nb=$('#dvN'),ab=$('#dvA');if(nb)nb.onclick=()=>{k++;draw()};if(ab)ab.onclick=()=>{k=n;draw()}};
+  draw()};
+ $('#dvGo').onclick=go;sel.onchange=()=>{out.innerHTML=''};
+}
+
+/* ---------- Navigation und Fortschritt ---------- */
+let cur='start';
+function show(id,push){
+ if(!ST.some(s=>s.id===id))id='start';cur=id;
+ $$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+id));
+ $$('#nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.id===id?'true':'false'));
+ const act=$('#nav button[aria-current="true"]');if(act&&act.scrollIntoView)try{act.scrollIntoView({block:'nearest',inline:'center'})}catch(e){}
+ if(push){try{history.replaceState(null,'','#'+id)}catch(e){location.hash=id}window.scrollTo(0,0)}
+ (LABS[id]||[]).forEach(f=>f());
+}
+function refresh(){
+ const n=QUIZ_IDS.filter(q=>S.quiz[q]).length;$('#progTxt').textContent=n+' von '+QUIZ_IDS.length+' Quiz geschafft';$('#progBar').style.width=(n/QUIZ_IDS.length*100)+'%';
+ $$('#nav button').forEach(b=>b.classList.toggle('done',!!S.quiz[b.dataset.id]));
+ $('#map').innerHTML=ST.slice(1).map(s=>{const q=S.quiz[s.id];return '<button type="button" data-go="'+s.id+'"><span class="no">'+(s.id==='check'?'Ziel':'Station '+s.n)+'</span><b>'+s.t+'</b><span>'+s.s+'</span><span class="st'+(q?' ok':'')+'">'+(q?'✓ Quiz: '+q.r+' von '+q.n:'noch offen')+'</span></button>'}).join('');
+ const lab={pp:'++ sehr sicher',p:'+ sicher',m:'− unsicher',mm:'−− noch sehr unsicher'};
+ $('#overview').innerHTML='<div class="tbl"><table><tr><th>Station</th><th>Ich kann …</th><th>Quiz</th><th>Einschätzung</th></tr>'+ST.filter(s=>s.can).map(s=>'<tr><td>'+s.n+'</td><td>'+s.can+'</td><td>'+(S.quiz[s.id]?S.quiz[s.id].r+' von '+S.quiz[s.id].n:'offen')+'</td><td>'+(lab[S.self[s.id]]||'offen')+'</td></tr>').join('')+'</table></div>';
+ $$('.self').forEach(d=>$$('button',d).forEach(b=>b.setAttribute('aria-pressed',S.self[d.dataset.id]===b.dataset.v?'true':'false')));
+}
+function init(){
+ $$('.view').forEach(v=>{v.innerHTML=M(v.innerHTML)});
+ $$('.ctrl label:not(.chk)').forEach(l=>{const sp=document.createElement('span');[...l.childNodes].forEach(n=>{if(n.nodeName!=='OUTPUT')sp.appendChild(n)});l.insertBefore(sp,l.firstChild)});
+ $('#nav').innerHTML=ST.map(s=>'<button type="button" data-id="'+s.id+'" data-go="'+s.id+'">'+(/^\d/.test(s.n)?'Baustein '+s.n:s.n)+'</button>').join('');
+ ST.forEach((s,i)=>{const v=$('#v-'+s.id);
+  const hd=document.createElement('div');hd.className='vhead';
+  hd.innerHTML='<div class="eyebrow">'+(s.id==='start'?'Start':s.id==='check'?'Ziel':'Baustein '+s.n+' · '+s.s)+'</div><h2>'+s.t+'</h2>'+(s.can?'<div class="can"><b>Ziel:</b> Ich kann '+s.can+'</div>':'');
+  v.insertBefore(hd,v.firstChild);
+  if(s.can){const c=document.createElement('div');c.className='card';c.innerHTML='<h3>Selbsteinschätzung</h3><p>Ich kann '+s.can+'</p><div class="self" data-id="'+s.id+'"><button type="button" data-v="pp">++</button><button type="button" data-v="p">+</button><button type="button" data-v="m">−</button><button type="button" data-v="mm">−−</button><span style="color:var(--muted);font-size:.9rem">++ sehr sicher, −− noch unsicher</span></div>';v.appendChild(c)}
+  const f=document.createElement('div');f.className='foot';
+  f.innerHTML=(i?'<button class="btn ghost" type="button" data-go="'+ST[i-1].id+'">← '+ST[i-1].t+'</button>':'<span></span>')+(i<ST.length-1?'<button class="btn" type="button" data-go="'+ST[i+1].id+'">'+(i?'Weiter: ':'Los geht es: ')+ST[i+1].t+' →</button>':'');
+  v.appendChild(f)});
+ $$('[data-steps]').forEach(e=>renderSteps(e,STEPS[e.dataset.steps]));
+ renderAll();
+ dvInit();
+ $('#bkMake').onclick=()=>{$('#bkOut').value='GB1-'+btoa(unescape(encodeURIComponent(JSON.stringify(S))));$('#bkMsg').textContent='Code erzeugt.'};
+ $('#bkCopy').onclick=()=>{const o=$('#bkOut'),m=$('#bkMsg');if(!o.value)$('#bkMake').onclick();o.focus();o.select();
+  const fail=()=>{m.textContent='Der Code ist markiert. Bitte jetzt von Hand kopieren.'};
+  try{navigator.clipboard.writeText(o.value).then(()=>{m.textContent='✓ Code kopiert.'},fail)}catch(e){fail()}};
+ $('#bkLoad').onclick=()=>{const m=$('#bkMsg2');try{const c=$('#bkIn').value.replace(/\s/g,'');if(!/^GB1-./.test(c))throw 0;
+   const t=JSON.parse(decodeURIComponent(escape(atob(c.slice(4)))));if(!t||typeof t.quiz!=='object')throw 0;
+   S=norm(t);save();renderAll();refresh();m.style.color='var(--good)';m.textContent='✓ Fortschritt übernommen.'}
+  catch(e){m.style.color='var(--bad)';m.textContent='✗ Der Code ist unvollständig oder fehlerhaft. Bitte vollständig kopieren, er beginnt mit GB1-.'}};
+ [['l1',lab1],['l2',lab2],['l3',lab3],['l4',lab4],['l5',lab5],['l6',lab6]].forEach(p=>$$('input[id^="'+p[0]+'"]').forEach(inp=>inp.addEventListener('input',p[1])));
+ $('#l5r').onclick=()=>{$('#l5b').value=60;$('#l5m').value=2;$('#l5f').value=54;$('#l5x').value=6.5;lab5()};
+ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){show(g.dataset.go,true);return}
+  const sb=e.target.closest('.self button');if(sb){S.self[sb.parentNode.dataset.id]=sb.dataset.v;save();refresh()}});
+ let armed=false;$('#reset').onclick=()=>{const m=$('#resetMsg');if(!armed){armed=true;m.textContent='Wirklich alles löschen? Dann noch einmal klicken.';return}
+  armed=false;S=norm(null);save();renderAll();refresh();m.textContent='Fortschritt gelöscht.'};
+ window.addEventListener('hashchange',()=>show(location.hash.slice(1),false));
+ let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>(LABS[cur]||[]).forEach(f=>f()),120)});
+ refresh();show(location.hash.slice(1)||'start',false);
+}
+window.__D={TASKS:TASKS,QUIZ:QUIZ,STEPS:STEPS,ev:ev,divText:divText};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>
